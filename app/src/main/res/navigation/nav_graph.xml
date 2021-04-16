@@ -6,5 +6,13 @@
     <fragment
         android:id="@+id/registerFragment"
         android:name="com.albertjk.chatapp.RegisterFragment"
-        android:label="RegisterFragment" />
+        android:label="RegisterFragment" >
+        <action
+            android:id="@+id/action_registerFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.albertjk.chatapp.LoginFragment"
+        android:label="LoginFragment" />
 </navigation>
