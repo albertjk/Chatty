@@ -21,7 +21,7 @@
 
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/emailTextInputLayout_register"
+        android:id="@+id/emailTextInputLayout_login"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_marginStart="32dp"
@@ -44,7 +44,7 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/passwordTextInputLayout_register"
+        android:id="@+id/passwordTextInputLayout_login"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_marginStart="32dp"
@@ -54,7 +54,7 @@
         app:errorEnabled="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/emailTextInputLayout_register"
+        app:layout_constraintTop_toBottomOf="@id/emailTextInputLayout_login"
         app:passwordToggleEnabled="true">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -73,11 +73,20 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:text="Login"
-        app:layout_constraintEnd_toEndOf="@+id/passwordTextInputLayout_register"
-        app:layout_constraintStart_toStartOf="@+id/passwordTextInputLayout_register"
-        app:layout_constraintTop_toBottomOf="@+id/passwordTextInputLayout_register" />
+        app:layout_constraintEnd_toEndOf="@+id/passwordTextInputLayout_login"
+        app:layout_constraintStart_toStartOf="@+id/passwordTextInputLayout_login"
+        app:layout_constraintTop_toBottomOf="@+id/passwordTextInputLayout_login" />
 
-
+    <TextView
+        android:id="@+id/backToRegistrationTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Back to registration"
+        android:textColor="@android:color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/loginButton" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

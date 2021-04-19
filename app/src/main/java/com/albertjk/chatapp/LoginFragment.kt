@@ -8,9 +8,10 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.android.synthetic.main.fragment_register.*
 
-class LoginFragment : Fragment() {
+class LoginFragment : Fragment(), View.OnClickListener {
 
     private val TAG = LoginFragment::class.qualifiedName
 
@@ -29,7 +30,22 @@ class LoginFragment : Fragment() {
 
         navController = Navigation.findNavController(view)
 
+        loginButton.setOnClickListener(this)
+        backToRegistrationTextView.setOnClickListener(this)
+    }
 
+    override fun onClick(v: View?) {
+        when (v) {
+            loginButton -> {
+
+                val email = emailTextInputLayout_login.editText?.text.toString()
+                val password = passwordTextInputLayout_login.editText?.text.toString()
+
+                Log.d(TAG, "Attempted login")
+            }
+
+            backToRegistrationTextView -> navController.navigate(R.id.action_loginFragment_to_registerFragment)
+        }
     }
 
 }
