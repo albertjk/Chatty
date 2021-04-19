@@ -92,7 +92,7 @@
             android:layout_width="match_parent"
             android:layout_height="30dp"
             android:background="#FFFFFF"
-            android:hint="Password"
+            android:hint="Password (min 6 characters)"
             android:inputType="textPassword"
             android:paddingStart="8dp" />
 
