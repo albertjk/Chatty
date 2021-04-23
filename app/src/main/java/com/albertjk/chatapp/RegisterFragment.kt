@@ -1,6 +1,10 @@
 package com.albertjk.chatapp
 
+import android.app.Activity
+import android.content.Intent
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -45,17 +49,48 @@ class RegisterFragment : Fragment(), View.OnClickListener {
         //    reload()
         //}
 
+        photoButton.setOnClickListener(this)
         registerButton.setOnClickListener(this)
         alreadyHaveAnAccountTextView.setOnClickListener(this)
     }
 
     override fun onClick(v: View?) {
         when (v) {
+
+            photoButton -> {
+                Log.d(TAG, "Show photo selector")
+
+                // Start photo selector intent
+                val intent = Intent(Intent.ACTION_PICK)
+                intent.type = "image/*"
+                startActivityForResult(intent, 0)
+            }
+
             registerButton -> {
                 register()
             }
 
             alreadyHaveAnAccountTextView -> navController.navigate(R.id.action_registerFragment_to_loginFragment)
+        }
+    }
+
+    /**
+     * This method is called when the photo selector intent is finished.
+     * The activity's result is processed here.
+     */
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if(requestCode == 0 && resultCode == Activity.RESULT_OK && data != null) {
+
+
+            Log.d(TAG, "Photo was selected")
+
+            // Get the selected photo and show it on the photo button.
+            val uri = data.data
+            val bitmap = MediaStore.Images.Media.getBitmap(activity?.contentResolver, uri)
+
+            photoButton.background = BitmapDrawable(bitmap)
         }
     }
 
