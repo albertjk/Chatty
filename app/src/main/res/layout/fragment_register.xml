@@ -4,46 +4,47 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/backgroundColor">
-
-    <ImageView
-        android:id="@+id/chatIcon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="64dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@drawable/chat_icon" />
+    android:background="@color/background">
 
     <TextView
         android:id="@+id/appNameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="32dp"
         android:text="Chat App"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Headline3"
         android:textColor="@android:color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chatIcon" />
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/photoButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Select\nphoto"
+        android:background="@drawable/round_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/appNameTextView" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/usernameTextInputLayout_register"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="24dp"
         android:layout_marginEnd="32dp"
         android:background="#FFFFFF"
         app:errorEnabled="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/appNameTextView">
+        app:layout_constraintTop_toBottomOf="@+id/photoButton">
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
-            android:layout_height="30dp"
+            android:layout_height="wrap_content"
             android:background="#FFFFFF"
             android:hint="Username"
             android:inputType="text"
@@ -66,7 +67,7 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
-            android:layout_height="30dp"
+            android:layout_height="wrap_content"
             android:background="#FFFFFF"
             android:hint="Email"
             android:inputType="textEmailAddress"
@@ -90,7 +91,7 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
-            android:layout_height="30dp"
+            android:layout_height="wrap_content"
             android:background="#FFFFFF"
             android:hint="Password (min 6 characters)"
             android:inputType="textPassword"
@@ -98,7 +99,7 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/registerButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

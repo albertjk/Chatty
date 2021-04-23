@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/backgroundColor">
+    android:background="@color/background">
 
     <TextView
         android:id="@+id/login_textView"
@@ -35,7 +35,7 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
-            android:layout_height="30dp"
+            android:layout_height="wrap_content"
             android:background="#FFFFFF"
             android:hint="Email"
             android:inputType="textEmailAddress"
@@ -59,7 +59,7 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
-            android:layout_height="30dp"
+            android:layout_height="wrap_content"
             android:background="#FFFFFF"
             android:hint="Password"
             android:inputType="textPassword"
@@ -67,7 +67,7 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/loginButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

@@ -4,4 +4,13 @@
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
     <color name="backgroundColor">#00ACC1</color>
+    <color name="liberty">#485696</color>
+    <color name="darkLiberty">#35406E</color>
+    <color name="platinum">#E7E7E7</color>
+
+    <color name="background">#A8DADC</color>
+    <color name="celadonBlue">#457B9D</color>
+    <color name="prussianBlue">#1D3557</color>
+
+
 </resources>
