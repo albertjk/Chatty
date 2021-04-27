@@ -101,14 +101,19 @@ class RegisterFragment : Fragment(), View.OnClickListener {
 
         if(requestCode == 0 && resultCode == Activity.RESULT_OK && data != null) {
 
-
             Log.d(TAG, "Photo was selected")
 
-            // Get the selected photo and show it on the photo button.
+            // Get the selected photo.
             selectedPhotoUri = data.data
             val bitmap = MediaStore.Images.Media.getBitmap(activity?.contentResolver, selectedPhotoUri)
 
-            photoButton.background = BitmapDrawable(bitmap)
+            // Show the photo on the circular image view.
+            photoImageView_register.setImageBitmap(bitmap)
+
+            // Make the circular photo button transparent. The user can tap it to choose another image.
+            photoButton.alpha = 0f
+
+            //photoButton.background = BitmapDrawable(bitmap)
         }
     }
 

@@ -30,6 +30,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/appNameTextView" />
 
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/photoImageView_register"
+        android:layout_width="110dp"
+        android:layout_height="110dp"
+        app:layout_constraintBottom_toBottomOf="@+id/photoButton"
+        app:layout_constraintEnd_toEndOf="@+id/photoButton"
+        app:layout_constraintStart_toStartOf="@+id/photoButton"
+        app:layout_constraintTop_toTopOf="@+id/photoButton" />
+
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/usernameTextInputLayout_register"
         android:layout_width="match_parent"
