@@ -3,6 +3,7 @@ package com.albertjk.chatapp
 import android.app.Activity
 import android.content.Intent
 import android.graphics.drawable.BitmapDrawable
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
@@ -16,7 +17,10 @@ import androidx.navigation.Navigation
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.ktx.storage
 import kotlinx.android.synthetic.main.fragment_register.*
+import java.util.*
 
 class RegisterFragment : Fragment(), View.OnClickListener {
 
@@ -26,6 +30,10 @@ class RegisterFragment : Fragment(), View.OnClickListener {
 
     // The shared instance of the FirebaseAuth object.
     private lateinit var auth: FirebaseAuth
+
+    private var selectedPhotoUri: Uri? = null
+
+    private lateinit var storage: FirebaseStorage
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -87,15 +95,15 @@ class RegisterFragment : Fragment(), View.OnClickListener {
             Log.d(TAG, "Photo was selected")
 
             // Get the selected photo and show it on the photo button.
-            val uri = data.data
-            val bitmap = MediaStore.Images.Media.getBitmap(activity?.contentResolver, uri)
+            selectedPhotoUri = data.data
+            val bitmap = MediaStore.Images.Media.getBitmap(activity?.contentResolver, selectedPhotoUri)
 
             photoButton.background = BitmapDrawable(bitmap)
         }
     }
 
     /**
-     * Get the user's input and create a new account for them.
+     * Gets the user's input and creates a new account for them.
      */
     private fun register() {
         val username = usernameTextInputLayout_register.editText?.text.toString().trim()
@@ -119,6 +127,8 @@ class RegisterFragment : Fragment(), View.OnClickListener {
                         Log.d(TAG, "Successfully created user with uid: ${it.result!!.user.uid}")
                         Toast.makeText(this.context, "Account created.", Toast.LENGTH_SHORT).show()
 
+                        uploadImageToFirebaseStorage()
+
                         // TODO:
                         // The user is automatically logged in, so redirect them the Messages fragment.
 
@@ -134,5 +144,31 @@ class RegisterFragment : Fragment(), View.OnClickListener {
                     }
                 }
         }
+    }
+
+    /**
+     * Gets the selected photo's Uri and uploads it to Firebase storage.
+     */
+    private fun uploadImageToFirebaseStorage() {
+
+        if (selectedPhotoUri == null) {
+            return
+        }
+
+        storage = Firebase.storage
+
+        // Images are saved in the 'images' directory in Firebase Storage.
+        val fileName = UUID.randomUUID().toString()
+        val imagesRef = storage.reference.child("/images/$fileName")
+
+        imagesRef.putFile(selectedPhotoUri!!)
+            .addOnSuccessListener {
+                Log.d(TAG, "Successfully uploaded image: ${it.metadata?.path}")
+
+                // Access the image file download URL.
+                imagesRef.downloadUrl.addOnSuccessListener { it2 ->
+                    Log.d(TAG, "File download URL: $it2")
+                }
+            }
     }
 }
