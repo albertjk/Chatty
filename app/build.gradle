@@ -53,5 +53,6 @@ dependencies {
     // Firebase Cloud Storage library
     implementation 'com.google.firebase:firebase-storage-ktx'
 
-
+    // Firebase Realtime Database library
+    implementation 'com.google.firebase:firebase-database-ktx'
 }

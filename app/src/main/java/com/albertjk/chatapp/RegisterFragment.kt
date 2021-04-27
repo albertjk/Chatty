@@ -16,6 +16,8 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
@@ -35,6 +37,8 @@ class RegisterFragment : Fragment(), View.OnClickListener {
 
     private lateinit var storage: FirebaseStorage
 
+    private lateinit var database: FirebaseDatabase
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -48,8 +52,14 @@ class RegisterFragment : Fragment(), View.OnClickListener {
 
         navController = Navigation.findNavController(view)
 
-        // Initialise Firebase Auth
+        // Initialise Firebase Auth.
         auth = Firebase.auth
+
+        // Initialise Firebase Storage.
+        storage = Firebase.storage
+
+        // Initialise the Firebase Realtime Database.
+        database = Firebase.database
 
         // Check if user is signed in (non-null).
         //val currentUser = auth.currentUser
@@ -68,7 +78,7 @@ class RegisterFragment : Fragment(), View.OnClickListener {
             photoButton -> {
                 Log.d(TAG, "Show photo selector")
 
-                // Start photo selector intent
+                // Start photo selector intent.
                 val intent = Intent(Intent.ACTION_PICK)
                 intent.type = "image/*"
                 startActivityForResult(intent, 0)
@@ -155,8 +165,6 @@ class RegisterFragment : Fragment(), View.OnClickListener {
             return
         }
 
-        storage = Firebase.storage
-
         // Images are saved in the 'images' directory in Firebase Storage.
         val fileName = UUID.randomUUID().toString()
         val imagesRef = storage.reference.child("/images/$fileName")
@@ -168,7 +176,34 @@ class RegisterFragment : Fragment(), View.OnClickListener {
                 // Access the image file download URL.
                 imagesRef.downloadUrl.addOnSuccessListener { it2 ->
                     Log.d(TAG, "File download URL: $it2")
+
+                    saveUserToFirebaseRealtimeDatabase(it2.toString())
                 }
+            }
+            .addOnFailureListener {
+                Log.e(TAG, "Error. ${it.toString()}")
+            }
+    }
+
+    /**
+     * Creates a new User using the provided data and saves it in the Firebase Realtime Database.
+     */
+    private fun saveUserToFirebaseRealtimeDatabase(profileImageUrl: String) {
+
+        val ref = database.getReference("/users/${auth.uid}")
+
+        // Create a User object and save it in the database.
+        val user = User(auth.uid!!, usernameTextInputLayout_register.editText!!.text.toString(), profileImageUrl)
+
+        ref.setValue(user)
+            .addOnSuccessListener {
+                Log.d(TAG, "User saved to Realtime Database.")
+            }
+            .addOnFailureListener {
+                Log.e(TAG, "Error. $it")
             }
     }
 }
+
+// Represents a user.
+class User(val uid: String, val username: String, val profileImageUrl: String)
