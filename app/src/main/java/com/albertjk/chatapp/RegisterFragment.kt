@@ -112,8 +112,6 @@ class RegisterFragment : Fragment(), View.OnClickListener {
 
             // Make the circular photo button transparent. The user can tap it to choose another image.
             photoButton.alpha = 0f
-
-            //photoButton.background = BitmapDrawable(bitmap)
         }
     }
 
@@ -137,17 +135,13 @@ class RegisterFragment : Fragment(), View.OnClickListener {
         } else {
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener {
+
                     // Registration successful.
                     if (it.isSuccessful) {
                         Log.d(TAG, "Successfully created user with uid: ${it.result!!.user.uid}")
                         Toast.makeText(this.context, "Account created.", Toast.LENGTH_SHORT).show()
 
                         uploadImageToFirebaseStorage()
-
-                        // TODO:
-                        // The user is automatically logged in, so redirect them the Messages fragment.
-
-                        // val user = auth.currentUser
                     }
                     /* If it fails, display a message to the user.
                     Input validation errors are displayed here by Firebase Auth.
@@ -179,14 +173,14 @@ class RegisterFragment : Fragment(), View.OnClickListener {
                 Log.d(TAG, "Successfully uploaded image: ${it.metadata?.path}")
 
                 // Access the image file download URL.
-                imagesRef.downloadUrl.addOnSuccessListener { it2 ->
-                    Log.d(TAG, "File download URL: $it2")
+                imagesRef.downloadUrl.addOnSuccessListener { url ->
+                    Log.d(TAG, "File download URL: $url")
 
-                    saveUserToFirebaseRealtimeDatabase(it2.toString())
+                    saveUserToFirebaseRealtimeDatabase(url.toString())
                 }
             }
             .addOnFailureListener {
-                Log.e(TAG, "Error. ${it.toString()}")
+                Log.e(TAG, "Error. $it")
             }
     }
 
@@ -203,6 +197,15 @@ class RegisterFragment : Fragment(), View.OnClickListener {
         ref.setValue(user)
             .addOnSuccessListener {
                 Log.d(TAG, "User saved to Realtime Database.")
+
+                // The user is automatically logged in, so redirect them to the Latest Messages fragment.
+                navController.navigate(R.id.action_registerFragment_to_latestMessagesFragment)
+
+                // val user = auth.currentUser
+
+
+
+
             }
             .addOnFailureListener {
                 Log.e(TAG, "Error. $it")
