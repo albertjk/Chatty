@@ -75,11 +75,10 @@ class LoginFragment : Fragment(), View.OnClickListener {
                     // Log in successful.
                     if (it.isSuccessful) {
                         Log.d(TAG, "signInWithEmailAndPassword: success")
-                        Log.d(TAG, "Successfully signed in user with uid: ${it.result!!.user.uid}")
+                        Log.d(TAG, "Successfully logged in user with uid: ${it.result!!.user.uid}")
 
-
-
-                        // TODO: Redirect user to the Messages fragment.
+                        // Redirect user to the Latest Messages fragment.
+                        navController.navigate(R.id.action_loginFragment_to_latestMessagesFragment)
 
                         //val user = auth.currentUser
 
