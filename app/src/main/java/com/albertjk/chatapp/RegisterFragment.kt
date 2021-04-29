@@ -123,15 +123,30 @@ class RegisterFragment : Fragment(), View.OnClickListener {
         val email = emailTextInputLayout_register.editText?.text.toString().trim()
         val password = passwordTextInputLayout_register.editText?.text.toString().trim()
 
+
         Log.d(TAG, "Attempted registration.")
         Log.d(TAG, "username is $username")
         Log.d(TAG, "email is $email")
         Log.d(TAG, "password is $password")
 
-        /* If the user did not fill out a field, tell them.
-        Otherwise, create a new user account with the email and the password. */
-        if(username.isEmpty() || email.isEmpty() || password.isEmpty()) {
-            Toast.makeText(this.context, "Please enter valid input.", Toast.LENGTH_LONG).show()
+        /* If the user did not add a photo or fill out a field, tell them.
+        Otherwise, create a new user account. */
+        var warningMessage = ""
+        if (photoButton.alpha != 0f) {
+            warningMessage += "Please add a photo. "
+        }
+        if (username.isEmpty()) {
+            warningMessage += "Please enter a valid username. "
+        }
+        if (email.isEmpty()) {
+            warningMessage += "Please enter a valid email. "
+        }
+        if (password.isEmpty()) {
+            warningMessage += "Please enter a valid password. "
+        }
+
+        if (photoButton.alpha != 0f || username.isEmpty() || email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this.context, warningMessage, Toast.LENGTH_LONG).show()
         } else {
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener {
@@ -192,7 +207,7 @@ class RegisterFragment : Fragment(), View.OnClickListener {
         val ref = database.getReference("/users/${auth.uid}")
 
         // Create a User object and save it in the database.
-        val user = User(auth.uid!!, usernameTextInputLayout_register.editText!!.text.toString(), profileImageUrl)
+        val user = User(auth.uid!!, usernameTextInputLayout_register.editText!!.text.toString(), profileImageUrl, emailTextInputLayout_register.editText!!.text.toString())
 
         ref.setValue(user)
             .addOnSuccessListener {
@@ -214,4 +229,4 @@ class RegisterFragment : Fragment(), View.OnClickListener {
 }
 
 // Represents a user.
-class User(val uid: String, val username: String, val profileImageUrl: String)
+class User(val uid: String, val username: String, val profileImageUrl: String, val email: String)
