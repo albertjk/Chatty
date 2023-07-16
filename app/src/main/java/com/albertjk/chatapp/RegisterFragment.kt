@@ -2,7 +2,6 @@ package com.albertjk.chatapp
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -14,6 +13,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import com.albertjk.chatapp.databinding.FragmentRegisterBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.FirebaseDatabase
@@ -21,7 +21,6 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
-import kotlinx.android.synthetic.main.fragment_register.*
 import java.util.*
 
 class RegisterFragment : Fragment(), View.OnClickListener {
@@ -39,12 +38,16 @@ class RegisterFragment : Fragment(), View.OnClickListener {
 
     private lateinit var database: FirebaseDatabase
 
+    private var _binding: FragmentRegisterBinding? = null
+    private val binding get () = _binding!!
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_register, container, false)
+        _binding = FragmentRegisterBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -67,15 +70,14 @@ class RegisterFragment : Fragment(), View.OnClickListener {
         //    reload()
         //}
 
-        photoButton.setOnClickListener(this)
-        registerButton.setOnClickListener(this)
-        alreadyHaveAnAccountTextView.setOnClickListener(this)
+        binding.photoButton.setOnClickListener(this)
+        binding.registerButton.setOnClickListener(this)
+        binding.alreadyHaveAnAccountTextView.setOnClickListener(this)
     }
 
     override fun onClick(v: View?) {
         when (v) {
-
-            photoButton -> {
+            binding.photoButton -> {
                 Log.d(TAG, "Show photo selector")
 
                 // Start photo selector intent.
@@ -83,12 +85,10 @@ class RegisterFragment : Fragment(), View.OnClickListener {
                 intent.type = "image/*"
                 startActivityForResult(intent, 0)
             }
-
-            registerButton -> {
+            binding.registerButton -> {
                 register()
             }
-
-            alreadyHaveAnAccountTextView -> navController.navigate(R.id.action_registerFragment_to_loginFragment)
+            binding.alreadyHaveAnAccountTextView -> navController.navigate(R.id.action_registerFragment_to_loginFragment)
         }
     }
 
@@ -100,7 +100,6 @@ class RegisterFragment : Fragment(), View.OnClickListener {
         super.onActivityResult(requestCode, resultCode, data)
 
         if(requestCode == 0 && resultCode == Activity.RESULT_OK && data != null) {
-
             Log.d(TAG, "Photo was selected")
 
             // Get the selected photo.
@@ -108,10 +107,10 @@ class RegisterFragment : Fragment(), View.OnClickListener {
             val bitmap = MediaStore.Images.Media.getBitmap(activity?.contentResolver, selectedPhotoUri)
 
             // Show the photo on the circular image view.
-            photoImageView_register.setImageBitmap(bitmap)
+            binding.photoImageViewRegister.setImageBitmap(bitmap)
 
             // Make the circular photo button transparent. The user can tap it to choose another image.
-            photoButton.alpha = 0f
+            binding.photoButton.alpha = 0f
         }
     }
 
@@ -119,10 +118,9 @@ class RegisterFragment : Fragment(), View.OnClickListener {
      * Gets the user's input and creates a new account for them.
      */
     private fun register() {
-        val username = usernameTextInputLayout_register.editText?.text.toString().trim()
-        val email = emailTextInputLayout_register.editText?.text.toString().trim()
-        val password = passwordTextInputLayout_register.editText?.text.toString().trim()
-
+        val username = binding.usernameTextInputLayoutRegister.editText?.text.toString().trim()
+        val email = binding.emailTextInputLayoutRegister.editText?.text.toString().trim()
+        val password = binding.passwordTextInputLayoutRegister.editText?.text.toString().trim()
 
         Log.d(TAG, "Attempted registration.")
         Log.d(TAG, "username is $username")
@@ -132,7 +130,7 @@ class RegisterFragment : Fragment(), View.OnClickListener {
         /* If the user did not add a photo or fill out a field, tell them.
         Otherwise, create a new user account. */
         var warningMessage = ""
-        if (photoButton.alpha != 0f) {
+        if (binding.photoButton.alpha != 0f) {
             warningMessage += "Please add a photo. "
         }
         if (username.isEmpty()) {
@@ -145,28 +143,42 @@ class RegisterFragment : Fragment(), View.OnClickListener {
             warningMessage += "Please enter a valid password. "
         }
 
-        if (photoButton.alpha != 0f || username.isEmpty() || email.isEmpty() || password.isEmpty()) {
+        if (binding.photoButton.alpha != 0f || username.isEmpty() || email.isEmpty() || password.isEmpty()) {
+            if (warningMessage.length > 10) {
+                warningMessage = "Please enter valid input."
+            }
             Toast.makeText(this.context, warningMessage, Toast.LENGTH_LONG).show()
+            return
         } else {
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener {
 
                     // Registration successful.
                     if (it.isSuccessful) {
-                        Log.d(TAG, "Successfully created user with uid: ${it.result!!.user.uid}")
+                        Log.d(TAG, "Successfully created user with uid: ${it.result!!.user!!.uid}")
                         Toast.makeText(this.context, "Account created.", Toast.LENGTH_SHORT).show()
 
                         uploadImageToFirebaseStorage()
+
+                        // Redirect the user to the LatestMessagesFragment.
+//                        navController.navigate(R.id.action_registerFragment_to_latestMessagesFragment)
+
                     }
                     /* If it fails, display a message to the user.
                     Input validation errors are displayed here by Firebase Auth.
                     If the e-mail is already in use, a message is displayed here by Firebase Auth. */
                     else {
                         Log.w(TAG, "createUserWithEmail: failure", it.exception)
-                        Log.d(TAG, "Exception message: " + it.exception!!.message)
+                        Log.d(TAG, it.exception!!.message.toString())
                         Toast.makeText(this.context, it.exception!!.message, Toast.LENGTH_LONG).show()
+                        return@addOnCompleteListener
                     }
                 }
+
+//                .addOnFailureListener {
+//                    Log.d(TAG, "Failed to create user: ${it.message}")
+//                    Toast.makeText(this.context, "Failed to create user: ${it.message}", Toast.LENGTH_LONG).show()
+//                }
         }
     }
 
@@ -203,11 +215,13 @@ class RegisterFragment : Fragment(), View.OnClickListener {
      * Creates a new User using the provided data and saves it in the Firebase Realtime Database.
      */
     private fun saveUserToFirebaseRealtimeDatabase(profileImageUrl: String) {
-
         val ref = database.getReference("/users/${auth.uid}")
 
+        Log.d(TAG, "username: ${binding.usernameTextInputLayoutRegister.editText!!.text}")
+        Log.d(TAG, "email: ${binding.emailTextInputLayoutRegister.editText!!.text}")
+
         // Create a User object and save it in the database.
-        val user = User(auth.uid!!, usernameTextInputLayout_register.editText!!.text.toString(), profileImageUrl, emailTextInputLayout_register.editText!!.text.toString())
+        val user = User(auth.uid!!, binding.usernameTextInputLayoutRegister.editText!!.text.toString(), profileImageUrl, binding.emailTextInputLayoutRegister.editText!!.text.toString())
 
         ref.setValue(user)
             .addOnSuccessListener {
@@ -228,5 +242,4 @@ class RegisterFragment : Fragment(), View.OnClickListener {
     }
 }
 
-// Represents a user.
-class User(val uid: String, val username: String, val profileImageUrl: String, val email: String)
+data class User(val uid: String, val username: String, val profileImageUrl: String, val email: String)
