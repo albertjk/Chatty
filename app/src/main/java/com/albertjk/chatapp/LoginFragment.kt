@@ -9,10 +9,10 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import com.albertjk.chatapp.databinding.FragmentLoginBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import kotlinx.android.synthetic.main.fragment_login.*
 
 class LoginFragment : Fragment(), View.OnClickListener {
 
@@ -23,12 +23,16 @@ class LoginFragment : Fragment(), View.OnClickListener {
     // The shared instance of the FirebaseAuth object.
     private lateinit var auth: FirebaseAuth
 
+    private var _binding: FragmentLoginBinding? = null
+    private val binding get () = _binding!!
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_login, container, false)
+        _binding = FragmentLoginBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -39,17 +43,17 @@ class LoginFragment : Fragment(), View.OnClickListener {
         // Initialise Firebase Auth
         auth = Firebase.auth
 
-        loginButton.setOnClickListener(this)
-        backToRegistrationTextView.setOnClickListener(this)
+        binding.loginButton.setOnClickListener(this)
+        binding.backToRegistrationTextView.setOnClickListener(this)
     }
 
     override fun onClick(v: View?) {
         when (v) {
-            loginButton -> {
+            binding.loginButton -> {
                 login()
             }
 
-            backToRegistrationTextView -> navController.navigate(R.id.action_loginFragment_to_registerFragment)
+            binding.backToRegistrationTextView -> navController.navigate(R.id.action_loginFragment_to_registerFragment)
         }
     }
 
@@ -57,9 +61,8 @@ class LoginFragment : Fragment(), View.OnClickListener {
      * Get the user's input and log them in.
      */
     private fun login() {
-        val email = emailTextInputLayout_login.editText?.text.toString().trim()
-        val password = passwordTextInputLayout_login.editText?.text.toString().trim()
-
+        val email = binding.emailTextInputLayoutLogin.editText?.text.toString().trim()
+        val password = binding.passwordTextInputLayoutLogin.editText?.text.toString().trim()
 
         Log.d(TAG, "Attempted login")
         Log.d(TAG, "email is $email")
@@ -75,7 +78,7 @@ class LoginFragment : Fragment(), View.OnClickListener {
                     // Log in successful.
                     if (it.isSuccessful) {
                         Log.d(TAG, "signInWithEmailAndPassword: success")
-                        Log.d(TAG, "Successfully logged in user with uid: ${it.result!!.user.uid}")
+                        Log.d(TAG, "Successfully logged in user with uid: ${it.result!!.user!!.uid}")
 
                         // Redirect user to the Latest Messages fragment.
                         navController.navigate(R.id.action_loginFragment_to_latestMessagesFragment)
@@ -91,6 +94,9 @@ class LoginFragment : Fragment(), View.OnClickListener {
                         Toast.makeText(this.context, it.exception!!.message, Toast.LENGTH_LONG).show()
                     }
                 }
+//                .addOnFailureListener {
+//
+//                }
         }
     }
 
