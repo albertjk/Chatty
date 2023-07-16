@@ -27,16 +27,17 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="32dp"
         android:layout_marginEnd="32dp"
-        android:background="#FFFFFF"
         app:errorEnabled="true"
+        app:boxStrokeWidth="0dp"
+        app:boxStrokeWidthFocused="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/login_textView">
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#FFFFFF"
+            android:layout_height="50dp"
+            android:background="@drawable/rounded_edittext_register_login"
             android:hint="Email"
             android:inputType="textEmailAddress"
             android:paddingStart="8dp" />
@@ -50,8 +51,9 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="32dp"
-        android:background="#FFFFFF"
         app:errorEnabled="true"
+        app:boxStrokeWidth="0dp"
+        app:boxStrokeWidthFocused="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/emailTextInputLayout_login"
@@ -59,9 +61,8 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#FFFFFF"
-            android:hint="Password"
+            android:layout_height="50dp"
+            android:background="@drawable/rounded_edittext_register_login"            android:hint="Password"
             android:inputType="textPassword"
             android:paddingStart="8dp" />
 
@@ -70,8 +71,9 @@
     <com.google.android.material.button.MaterialButton
         android:id="@+id/loginButton"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="55dp"
         android:layout_marginTop="24dp"
+        app:cornerRadius="25dp"
         android:text="Login"
         app:layout_constraintEnd_toEndOf="@+id/passwordTextInputLayout_login"
         app:layout_constraintStart_toStartOf="@+id/passwordTextInputLayout_login"
