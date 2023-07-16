@@ -1,10 +1,16 @@
 package com.albertjk.chatapp
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import com.albertjk.chatapp.databinding.FragmentLatestMessagesBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -18,14 +24,18 @@ class LatestMessagesFragment : Fragment() {
     // The shared instance of the FirebaseAuth object.
     private lateinit var auth: FirebaseAuth
 
+    private var _binding: FragmentLatestMessagesBinding? = null
+    private val binding get () = _binding!!
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         setHasOptionsMenu(true)
 
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_latest_messages, container, false)
+        _binding = FragmentLatestMessagesBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -37,7 +47,6 @@ class LatestMessagesFragment : Fragment() {
         auth = Firebase.auth
 
         checkUserIsLoggedIn()
-
     }
 
     /**
@@ -51,6 +60,10 @@ class LatestMessagesFragment : Fragment() {
         }
     }
 
+
+    /**
+     * Creates the top navigation menu.
+     */
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
@@ -60,9 +73,6 @@ class LatestMessagesFragment : Fragment() {
      * Runs when a menu item is clicked.
      */
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-
-
-
         when(item.itemId) {
             R.id.menu_new_message -> {
 
