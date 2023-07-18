@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/nav_graph.xml"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph.xml"
     app:startDestination="@id/latestMessagesFragment">
     <!-- Latest Messages fragment is shown when the app is launched,
     so that the user can stay logged in and does not have to log in every time when launching the app. -->
@@ -64,5 +66,13 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right"/>
+        <action
+            android:id="@+id/action_latestMessagesFragment_to_newMessageFragment"
+            app:destination="@id/newMessageFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/newMessageFragment"
+        android:name="com.albertjk.chatapp.NewMessageFragment"
+        android:label="fragment_new_message"
+        tools:layout="@layout/fragment_new_message" />
 </navigation>

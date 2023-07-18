@@ -75,7 +75,7 @@ class LatestMessagesFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
             R.id.menu_new_message -> {
-
+                navController.navigate(R.id.action_latestMessagesFragment_to_newMessageFragment)
             }
             R.id.menu_log_out -> {
 
