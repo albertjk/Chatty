@@ -241,5 +241,3 @@ class RegisterFragment : Fragment(), View.OnClickListener {
             }
     }
 }
-
-data class User(val uid: String, val username: String, val profileImageUrl: String, val email: String)
