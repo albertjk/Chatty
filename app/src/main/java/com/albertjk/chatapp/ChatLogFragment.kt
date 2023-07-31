@@ -1,6 +1,7 @@
 package com.albertjk.chatapp
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +15,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.albertjk.chatapp.adapters.ChatFromItemAdapter
 import com.albertjk.chatapp.adapters.ChatToItemAdapter
 import com.albertjk.chatapp.databinding.FragmentChatLogBinding
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 
 
 class ChatLogFragment : Fragment() {
@@ -55,7 +59,36 @@ class ChatLogFragment : Fragment() {
 
         setUpMessages()
 
+        val recipientUserId = recipientUser.uid
+
+        binding.sendButton.setOnClickListener {
+            Log.d(TAG, "Send message...")
+            sendMessage(recipientUserId)
+        }
+
         initChatLogRecyclerView()
+    }
+
+    private fun sendMessage(toUserId: String) {
+        // push generates a new node to start saving data in messages.
+        val ref = Firebase.database.getReference("/messages").push()
+
+        val message = binding.enterMessageEditText.text.toString()
+
+        val messageId = ref.key.toString()
+
+        // The signed in user's UID.
+        val fromUserId = FirebaseAuth.getInstance().uid
+            ?: throw NullPointerException("fromUserId cannot be null")
+
+        val currentTimeInSeconds: Long = System.currentTimeMillis() / 1000
+
+        val chatMessage = ChatMessage(messageId, message, fromUserId, toUserId, currentTimeInSeconds)
+
+        ref.setValue(chatMessage)
+            .addOnSuccessListener {
+                Log.d(TAG, "Saved chat message: ${ref.key}")
+            }
     }
 
     private fun setUpMessages() {
