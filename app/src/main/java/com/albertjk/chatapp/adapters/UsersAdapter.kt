@@ -1,9 +1,12 @@
-package com.albertjk.chatapp
+package com.albertjk.chatapp.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.navigation.NavController
 import androidx.recyclerview.widget.RecyclerView
+import com.albertjk.chatapp.R
+import com.albertjk.chatapp.User
 import com.albertjk.chatapp.databinding.UserRowBinding
 import com.squareup.picasso.Picasso
 
@@ -17,27 +20,37 @@ class UsersAdapter(private val userList: MutableList<User>, private val navContr
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): UsersAdapter.UsersViewHolder {
+    ): UsersViewHolder {
         val binding = UserRowBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return UsersViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: UsersAdapter.UsersViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: UsersViewHolder, position: Int) {
         with(holder) {
             with(userList[position]) {
-                Picasso.get().load(userList[position].profileImageUrl).into(binding.photoImageViewUser)
-                binding.usernameTextView.text = userList[position].username
+                val user = userList[position]
+
+                Picasso.get().load(user.profileImageUrl).into(binding.photoImageViewUser)
+                binding.usernameTextView.text = user.username
+
+                holder.itemView.setOnClickListener {
+                    val bundle = bundleOf(
+//                "username" to holder.binding.usernameTextView.text
+                    "user" to user
+                    )
+                    navController.navigate(
+                        R.id.action_newMessageFragment_to_chatLogFragment,
+                        bundle
+                    )
+                }
             }
         }
 
-        holder.itemView.setOnClickListener {
-            navController.navigate(R.id.action_newMessageFragment_to_chatLogFragment)
-        }
+
     }
 
     /**
      * Returns the number of recycler view rows to display.
      */
     override fun getItemCount(): Int = userList.size
-
 }

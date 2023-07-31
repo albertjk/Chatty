@@ -11,6 +11,7 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.albertjk.chatapp.adapters.UsersAdapter
 import com.albertjk.chatapp.databinding.FragmentNewMessageBinding
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -53,10 +54,10 @@ class NewMessageFragment : Fragment() {
 
         dbReference = Firebase.database.reference
 
-        getUsersFromFirebase(dbReference)
+        getUsersFromDatabase(dbReference)
     }
 
-    private fun getUsersFromFirebase(dbReference: DatabaseReference) {
+    private fun getUsersFromDatabase(dbReference: DatabaseReference) {
 
         val listener = object:ValueEventListener {
             // onDataChange is called every time we retrieve all users from the database.
@@ -70,7 +71,7 @@ class NewMessageFragment : Fragment() {
                         userList.add(user)
                     }
                  } }
-                val usersAdapter = activity?.let { UsersAdapter(userList) }
+                val usersAdapter = activity?.let { UsersAdapter(userList, navController) }
                 usersRecyclerView.adapter = usersAdapter
             }
 
@@ -83,8 +84,8 @@ class NewMessageFragment : Fragment() {
 
     private fun initUsersRecyclerView() {
         usersRecyclerView = binding.newMessageRecyclerView.findViewById(R.id.newMessageRecyclerView)
-        val usersAdapter = activity?.let { UsersAdapter(mutableListOf()) }
         usersRecyclerView.layoutManager = LinearLayoutManager(activity)
+        val usersAdapter = activity?.let { UsersAdapter(mutableListOf(), navController) }
         usersRecyclerView.adapter = usersAdapter
     }
 }

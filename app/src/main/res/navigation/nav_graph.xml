@@ -68,11 +68,34 @@
             app:popExitAnim="@anim/slide_out_right"/>
         <action
             android:id="@+id/action_latestMessagesFragment_to_newMessageFragment"
-            app:destination="@id/newMessageFragment" />
+            app:destination="@id/newMessageFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
     </fragment>
     <fragment
         android:id="@+id/newMessageFragment"
         android:name="com.albertjk.chatapp.NewMessageFragment"
         android:label="fragment_new_message"
-        tools:layout="@layout/fragment_new_message" />
+        tools:layout="@layout/fragment_new_message" >
+        <action
+            android:id="@+id/action_newMessageFragment_to_chatLogFragment"
+            app:destination="@id/chatLogFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
+    </fragment>
+    <fragment
+        android:id="@+id/chatLogFragment"
+        android:name="com.albertjk.chatapp.ChatLogFragment"
+        android:label="fragment_chat_log"
+        tools:layout="@layout/fragment_chat_log" >
+        <action android:id="@+id/action_chatLogFragment_to_newMessageFragment"
+            app:destination="@id/newMessageFragment" />
+        <argument
+            android:name="user"
+            app:argType="com.albertjk.chatapp.User" />
+    </fragment>
 </navigation>
