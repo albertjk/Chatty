@@ -2,11 +2,12 @@ package com.albertjk.chatapp
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.navigation.NavController
 import androidx.recyclerview.widget.RecyclerView
 import com.albertjk.chatapp.databinding.UserRowBinding
 import com.squareup.picasso.Picasso
 
-class UsersAdapter(private val userList: MutableList<User>):
+class UsersAdapter(private val userList: MutableList<User>, private val navController: NavController):
     RecyclerView.Adapter<UsersAdapter.UsersViewHolder>() {
 
     private val TAG = this::class.qualifiedName
@@ -27,6 +28,10 @@ class UsersAdapter(private val userList: MutableList<User>):
                 Picasso.get().load(userList[position].profileImageUrl).into(binding.photoImageViewUser)
                 binding.usernameTextView.text = userList[position].username
             }
+        }
+
+        holder.itemView.setOnClickListener {
+            navController.navigate(R.id.action_newMessageFragment_to_chatLogFragment)
         }
     }
 
