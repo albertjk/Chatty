@@ -7,4 +7,8 @@ import kotlinx.parcelize.Parcelize
 data class User(val uid: String, var username: String, val profileImageUrl: String, val email: String):
     Parcelable {
     constructor(): this("", "", "", "")
+
+    fun isNotNullOrEmpty(): Boolean {
+        return !(this.uid.isNullOrEmpty() || this.username.isNullOrEmpty() || this.profileImageUrl.isNullOrEmpty() || this.email.isNullOrEmpty())
+    }
 }

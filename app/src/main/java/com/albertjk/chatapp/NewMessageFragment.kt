@@ -30,7 +30,7 @@ class NewMessageFragment : Fragment() {
     private lateinit var dbReference: DatabaseReference
 
     private var _binding: FragmentNewMessageBinding? = null
-    private val binding get () = _binding!!
+    private val binding get() = _binding!!
 
     private lateinit var usersRecyclerView: RecyclerView
 
@@ -59,18 +59,20 @@ class NewMessageFragment : Fragment() {
 
     private fun getUsersFromDatabase(dbReference: DatabaseReference) {
 
-        val listener = object:ValueEventListener {
+        val listener = object : ValueEventListener {
             // onDataChange is called every time we retrieve all users from the database.
             override fun onDataChange(snapshot: DataSnapshot) {
                 val userList = mutableListOf<User>()
 
-                snapshot.children.forEach { it.children.forEach {child ->
-                    Log.d(TAG, child.toString())
-                    val user = child.getValue(User::class.java)
-                    if (user != null) {
-                        userList.add(user)
+                snapshot.children.forEach {
+                    it.children.forEach { child ->
+                        Log.d(TAG, child.toString())
+                        val user = child.getValue(User::class.java)
+                        if (user != null && user.isNotNullOrEmpty()) {
+                            userList.add(user)
+                        }
                     }
-                 } }
+                }
                 val usersAdapter = activity?.let { UsersAdapter(userList, navController) }
                 usersRecyclerView.adapter = usersAdapter
             }
