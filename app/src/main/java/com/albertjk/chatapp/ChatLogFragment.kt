@@ -16,6 +16,9 @@ import com.albertjk.chatapp.adapters.ChatFromItemAdapter
 import com.albertjk.chatapp.adapters.ChatToItemAdapter
 import com.albertjk.chatapp.databinding.FragmentChatLogBinding
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
@@ -30,6 +33,9 @@ class ChatLogFragment : Fragment() {
 
     private lateinit var chatFromItemAdapter: ChatFromItemAdapter
     private lateinit var chatToItemAdapter: ChatToItemAdapter
+
+    // The Concat Adapter shows the two adapter's contents in sequence on the screen.
+    private lateinit var concatAdapter: ConcatAdapter
 
     private lateinit var chatLogRecyclerView: RecyclerView
 
@@ -55,9 +61,7 @@ class ChatLogFragment : Fragment() {
 
         (activity as AppCompatActivity?)!!.supportActionBar?.title = recipientUser.username
 
-        val messages: List<String> = listOf("Hi", "How are you?", "No", "What?", "Okay")
-
-        setUpMessages()
+        listenForMessages()
 
         val recipientUserId = recipientUser.uid
 
@@ -91,17 +95,59 @@ class ChatLogFragment : Fragment() {
             }
     }
 
-    private fun setUpMessages() {
-        val fromMessages = listOf("From Message...")
-        val toMessages = listOf("This is the to row text message that is longer.")
+    private fun listenForMessages() {
+        val ref = Firebase.database.getReference("/messages")
 
-        chatFromItemAdapter = ChatFromItemAdapter(fromMessages)
-        chatToItemAdapter = ChatToItemAdapter(toMessages)
+        /* Notifies of every piece of data that belongs to the 'messages' node.
+        This allows for listening for new messages as they are coming in real time. */
+        ref.addChildEventListener(object : ChildEventListener {
+
+            // Adds a new message to the current node of 'messages'.
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                val chatMessage = snapshot.getValue(ChatMessage::class.java)
+                    ?: throw NullPointerException("Chat message cannot be null.")
+
+                Log.d(TAG, "Chat message: ${chatMessage.text}")
+
+                // The signed in user's UID.
+                val signedInUsersId = FirebaseAuth.getInstance().uid
+                    ?: throw NullPointerException("fromUserId cannot be null")
+
+                // Decide which adapter to use based on the signed in user's ID.
+                // Get all existing messages and add the new one to it.
+                if (signedInUsersId == chatMessage.fromUserId) {
+                    val existingMessages: MutableList<String> = chatFromItemAdapter.getMessages().toMutableList()
+                    existingMessages.add(chatMessage.text)
+                    chatFromItemAdapter = ChatFromItemAdapter(existingMessages)
+                } else {
+                    val existingMessages: MutableList<String> = chatToItemAdapter.getMessages().toMutableList()
+                    existingMessages.add(chatMessage.text)
+                    chatToItemAdapter = ChatToItemAdapter(existingMessages)
+                }
+
+                setConcatAdapter()
+            }
+
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
+
+            override fun onChildRemoved(snapshot: DataSnapshot) {}
+
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
+
+            override fun onCancelled(error: DatabaseError) {}
+        })
     }
 
     private fun initChatLogRecyclerView() {
         chatLogRecyclerView = binding.chatLogRecyclerView.findViewById(R.id.chatLogRecyclerView)
         chatLogRecyclerView.layoutManager = LinearLayoutManager(activity)
-        chatLogRecyclerView.adapter = ConcatAdapter(chatFromItemAdapter, chatToItemAdapter)
+        chatFromItemAdapter = ChatFromItemAdapter(mutableListOf())
+        chatToItemAdapter = ChatToItemAdapter(mutableListOf())
+        setConcatAdapter()
+    }
+
+    private fun setConcatAdapter() {
+        concatAdapter = ConcatAdapter(chatFromItemAdapter, chatToItemAdapter)
+        chatLogRecyclerView.adapter = concatAdapter
     }
 }

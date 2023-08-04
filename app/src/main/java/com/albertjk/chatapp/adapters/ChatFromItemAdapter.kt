@@ -30,4 +30,6 @@ class ChatFromItemAdapter(private val messages: List<String>):
      * Returns the number of recycler view rows to display.
      */
     override fun getItemCount(): Int = messages.size
+
+    fun getMessages(): List<String> = messages
 }
