@@ -29,7 +29,6 @@ class RegisterFragment : Fragment(), View.OnClickListener {
 
     private lateinit var navController: NavController
 
-    // The shared instance of the FirebaseAuth object.
     private lateinit var auth: FirebaseAuth
 
     private var selectedPhotoUri: Uri? = null

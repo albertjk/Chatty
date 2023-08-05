@@ -8,7 +8,7 @@ data class User(val uid: String, var username: String, val profileImageUrl: Stri
     Parcelable {
     constructor(): this("", "", "", "")
 
-    fun isNotNullOrEmpty(): Boolean {
-        return !(this.uid.isNullOrEmpty() || this.username.isNullOrEmpty() || this.profileImageUrl.isNullOrEmpty() || this.email.isNullOrEmpty())
+    fun isNullOrEmpty(): Boolean {
+        return this.uid.isNullOrEmpty() || this.username.isNullOrEmpty() || this.profileImageUrl.isNullOrEmpty() || this.email.isNullOrEmpty()
     }
 }

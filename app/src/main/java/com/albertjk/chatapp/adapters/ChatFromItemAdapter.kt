@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.albertjk.chatapp.databinding.ChatFromRowBinding
 
-class ChatFromItemAdapter(private val messages: List<String>):
+class ChatFromItemAdapter(private val messages: List<String>, private val fromUserProfileImageUrl: String):
     RecyclerView.Adapter<ChatFromItemAdapter.ChatFromItemViewHolder>() {
 
     private val TAG = this::class.qualifiedName
@@ -22,7 +22,7 @@ class ChatFromItemAdapter(private val messages: List<String>):
 
     override fun onBindViewHolder(holder: ChatFromItemViewHolder, position: Int) {
         with(messages[position]) {
-//                com.squareup.picasso.Picasso.get().load(userList[position].profileImageUrl).into(binding.photoImageViewUser)
+            com.squareup.picasso.Picasso.get().load(fromUserProfileImageUrl).into(holder.binding.photoImageViewUserFromRow)
             holder.binding.messageTextViewFromRow.text = messages[position]
         }
     }

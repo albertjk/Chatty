@@ -19,6 +19,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
@@ -27,6 +30,10 @@ class ChatLogFragment : Fragment() {
     private val TAG = this::class.qualifiedName
 
     private lateinit var navController: NavController
+
+    private lateinit var auth: FirebaseAuth
+
+    private lateinit var database: FirebaseDatabase
 
     private var _binding: FragmentChatLogBinding? = null
     private val binding get () = _binding!!
@@ -38,6 +45,9 @@ class ChatLogFragment : Fragment() {
     private lateinit var concatAdapter: ConcatAdapter
 
     private lateinit var chatLogRecyclerView: RecyclerView
+
+    private var fromUserProfileImageUrl: String = ""
+    private lateinit var toUserProfileImageUrl: String
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -53,11 +63,19 @@ class ChatLogFragment : Fragment() {
 
         navController = Navigation.findNavController(view)
 
+        auth = FirebaseAuth.getInstance()
+
+        database = Firebase.database
+
         val recipientUser = arguments?.getParcelable<User>("user")
 
-        if (recipientUser?.username == null) {
-            throw NullPointerException("Username missing.")
+        if (recipientUser == null || recipientUser.isNullOrEmpty()) {
+            throw NullPointerException("Recipient user data is missing.")
         }
+
+        toUserProfileImageUrl = recipientUser.profileImageUrl
+        Log.d(TAG, "toUserProfileImageUrl: $toUserProfileImageUrl")
+        getFromUser()
 
         (activity as AppCompatActivity?)!!.supportActionBar?.title = recipientUser.username
 
@@ -73,16 +91,32 @@ class ChatLogFragment : Fragment() {
         initChatLogRecyclerView()
     }
 
+    private fun getFromUser() {
+        val ref = database.getReference("/users/${auth.uid}").child("profileImageUrl")
+
+        ref.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                fromUserProfileImageUrl = snapshot.getValue(String::class.java).toString()
+
+                Log.d(TAG, "fromUserProfileImageUrl: $fromUserProfileImageUrl")
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e(TAG, "Getting user profile image from database is cancelled. Error: $error")
+            }
+        })
+    }
+
     private fun sendMessage(toUserId: String) {
         // push generates a new node to start saving data in messages.
-        val ref = Firebase.database.getReference("/messages").push()
+        val ref = database.getReference("/messages").push()
 
         val message = binding.enterMessageEditText.text.toString()
 
         val messageId = ref.key.toString()
 
         // The signed in user's UID.
-        val fromUserId = FirebaseAuth.getInstance().uid
+        val fromUserId = auth.uid
             ?: throw NullPointerException("fromUserId cannot be null")
 
         val currentTimeInSeconds: Long = System.currentTimeMillis() / 1000
@@ -96,7 +130,7 @@ class ChatLogFragment : Fragment() {
     }
 
     private fun listenForMessages() {
-        val ref = Firebase.database.getReference("/messages")
+        val ref = database.getReference("/messages")
 
         /* Notifies of every piece of data that belongs to the 'messages' node.
         This allows for listening for new messages as they are coming in real time. */
@@ -118,11 +152,11 @@ class ChatLogFragment : Fragment() {
                 if (signedInUsersId == chatMessage.fromUserId) {
                     val existingMessages: MutableList<String> = chatFromItemAdapter.getMessages().toMutableList()
                     existingMessages.add(chatMessage.text)
-                    chatFromItemAdapter = ChatFromItemAdapter(existingMessages)
+                    chatFromItemAdapter = ChatFromItemAdapter(existingMessages, fromUserProfileImageUrl)
                 } else {
                     val existingMessages: MutableList<String> = chatToItemAdapter.getMessages().toMutableList()
                     existingMessages.add(chatMessage.text)
-                    chatToItemAdapter = ChatToItemAdapter(existingMessages)
+                    chatToItemAdapter = ChatToItemAdapter(existingMessages, toUserProfileImageUrl)
                 }
 
                 setConcatAdapter()
@@ -134,15 +168,17 @@ class ChatLogFragment : Fragment() {
 
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
 
-            override fun onCancelled(error: DatabaseError) {}
+            override fun onCancelled(error: DatabaseError) {
+                Log.e(TAG, "Adding a new message to the database is cancelled. Error: $error")
+            }
         })
     }
 
     private fun initChatLogRecyclerView() {
         chatLogRecyclerView = binding.chatLogRecyclerView.findViewById(R.id.chatLogRecyclerView)
         chatLogRecyclerView.layoutManager = LinearLayoutManager(activity)
-        chatFromItemAdapter = ChatFromItemAdapter(mutableListOf())
-        chatToItemAdapter = ChatToItemAdapter(mutableListOf())
+        chatFromItemAdapter = ChatFromItemAdapter(mutableListOf(), fromUserProfileImageUrl)
+        chatToItemAdapter = ChatToItemAdapter(mutableListOf(), toUserProfileImageUrl)
         setConcatAdapter()
     }
 

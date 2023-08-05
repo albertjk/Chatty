@@ -58,8 +58,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun getUsersFromDatabase(dbReference: DatabaseReference) {
-
-        val listener = object : ValueEventListener {
+        dbReference.addValueEventListener(object : ValueEventListener {
             // onDataChange is called every time we retrieve all users from the database.
             override fun onDataChange(snapshot: DataSnapshot) {
                 val userList = mutableListOf<User>()
@@ -68,7 +67,7 @@ class NewMessageFragment : Fragment() {
                     it.children.forEach { child ->
                         Log.d(TAG, child.toString())
                         val user = child.getValue(User::class.java)
-                        if (user != null && user.isNotNullOrEmpty()) {
+                        if (user != null && !user.isNullOrEmpty()) {
                             userList.add(user)
                         }
                     }
@@ -80,8 +79,7 @@ class NewMessageFragment : Fragment() {
             override fun onCancelled(error: DatabaseError) {
                 Log.e(TAG, "Getting users from database is cancelled. Error: $error")
             }
-        }
-        dbReference.addValueEventListener(listener)
+        })
     }
 
     private fun initUsersRecyclerView() {
