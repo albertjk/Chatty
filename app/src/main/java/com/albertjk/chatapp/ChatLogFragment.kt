@@ -19,7 +19,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
@@ -79,13 +78,17 @@ class ChatLogFragment : Fragment() {
 
         (activity as AppCompatActivity?)!!.supportActionBar?.title = recipientUser.username
 
-        listenForMessages()
+        val toUserId = recipientUser.uid
 
-        val recipientUserId = recipientUser.uid
+        // The signed in user's UID.
+        val fromUserId = auth.uid
+            ?: throw NullPointerException("fromUserId cannot be null")
+
+        listenForMessages(fromUserId, toUserId)
 
         binding.sendButton.setOnClickListener {
             Log.d(TAG, "Send message...")
-            sendMessage(recipientUserId)
+            sendMessage(fromUserId, toUserId)
         }
 
         initChatLogRecyclerView()
@@ -107,30 +110,8 @@ class ChatLogFragment : Fragment() {
         })
     }
 
-    private fun sendMessage(toUserId: String) {
-        // push generates a new node to start saving data in messages.
-        val ref = database.getReference("/messages").push()
-
-        val message = binding.enterMessageEditText.text.toString()
-
-        val messageId = ref.key.toString()
-
-        // The signed in user's UID.
-        val fromUserId = auth.uid
-            ?: throw NullPointerException("fromUserId cannot be null")
-
-        val currentTimeInSeconds: Long = System.currentTimeMillis() / 1000
-
-        val chatMessage = ChatMessage(messageId, message, fromUserId, toUserId, currentTimeInSeconds)
-
-        ref.setValue(chatMessage)
-            .addOnSuccessListener {
-                Log.d(TAG, "Saved chat message: ${ref.key}")
-            }
-    }
-
-    private fun listenForMessages() {
-        val ref = database.getReference("/messages")
+    private fun listenForMessages(fromUserId: String, toUserId: String) {
+        val ref = database.getReference("/user-messages/$fromUserId/$toUserId")
 
         /* Notifies of every piece of data that belongs to the 'messages' node.
         This allows for listening for new messages as they are coming in real time. */
@@ -172,6 +153,30 @@ class ChatLogFragment : Fragment() {
                 Log.e(TAG, "Adding a new message to the database is cancelled. Error: $error")
             }
         })
+    }
+
+    private fun sendMessage(fromUserId: String, toUserId: String) {
+        val message = binding.enterMessageEditText.text.toString()
+
+        // push generates a new node to start saving data.
+        val ref = database.getReference("/user-messages/$fromUserId/$toUserId").push()
+
+        val messageId = ref.key.toString()
+
+        val currentTimeInSeconds: Long = System.currentTimeMillis() / 1000
+
+        val chatMessage = ChatMessage(messageId, message, fromUserId, toUserId, currentTimeInSeconds)
+
+        ref.setValue(chatMessage)
+            .addOnSuccessListener {
+                Log.d(TAG, "Saved chat message: ${ref.key}")
+            }
+
+        // Send the message to the fromUser's chat history as well so they also have a copy of the message.
+        database.getReference("/user-messages/$toUserId/$fromUserId").push().setValue(chatMessage)
+            .addOnSuccessListener {
+                Log.d(TAG, "Saved chat message: ${ref.key}")
+            }
     }
 
     private fun initChatLogRecyclerView() {
