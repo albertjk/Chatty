@@ -170,12 +170,14 @@ class ChatLogFragment : Fragment() {
         ref.setValue(chatMessage)
             .addOnSuccessListener {
                 Log.d(TAG, "Saved chat message: ${ref.key}")
+                binding.enterMessageEditText.text.clear()
+                chatLogRecyclerView.scrollToPosition(concatAdapter.itemCount - 1)
             }
 
         // Send the message to the fromUser's chat history as well so they also have a copy of the message.
         database.getReference("/user-messages/$toUserId/$fromUserId").push().setValue(chatMessage)
             .addOnSuccessListener {
-                Log.d(TAG, "Saved chat message: ${ref.key}")
+                Log.d(TAG, "Saved chat message copy: ${ref.key}")
             }
     }
 
