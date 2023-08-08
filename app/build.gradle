@@ -68,4 +68,8 @@ dependencies {
 
     // Picasso image library
     implementation 'com.squareup.picasso:picasso:2.8'
+
+    // Groupie library to display recycler view rows
+    implementation "com.xwray:groupie:$groupie_version"
+    implementation "com.xwray:groupie-viewbinding:$groupie_version"
 }

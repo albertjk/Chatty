@@ -1,6 +1,7 @@
 package com.albertjk.chatapp
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -13,6 +14,11 @@ import androidx.navigation.Navigation
 import com.albertjk.chatapp.databinding.FragmentLatestMessagesBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
 
 class LatestMessagesFragment : Fragment() {
@@ -26,6 +32,10 @@ class LatestMessagesFragment : Fragment() {
 
     private var _binding: FragmentLatestMessagesBinding? = null
     private val binding get () = _binding!!
+
+    companion object {
+        var signedInUser: User? = null
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,10 +53,27 @@ class LatestMessagesFragment : Fragment() {
 
         navController = Navigation.findNavController(view)
 
-        // Initialise Firebase Auth.
         auth = Firebase.auth
 
         checkUserIsLoggedIn()
+
+        getSignedInUser()
+    }
+
+    private fun getSignedInUser() {
+        val ref = FirebaseDatabase.getInstance().getReference("/users/${auth.uid}")
+        ref.addListenerForSingleValueEvent(object: ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                signedInUser = snapshot.getValue(User::class.java)
+                if (signedInUser == null || signedInUser!!.isNullOrEmpty()) {
+                    throw NullPointerException("Recipient user data is missing.")
+                }
+                Log.d(TAG, "Currently signed in user: ${signedInUser!!.username}")
+            }
+            override fun onCancelled(error: DatabaseError) {
+                Log.e(TAG, "Getting the currently signed in user is cancelled. Error: $error")
+            }
+        })
     }
 
     /**

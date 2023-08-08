@@ -9,11 +9,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
-import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.albertjk.chatapp.adapters.ChatFromItemAdapter
-import com.albertjk.chatapp.adapters.ChatToItemAdapter
 import com.albertjk.chatapp.databinding.FragmentChatLogBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ChildEventListener
@@ -23,7 +20,8 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-
+import com.xwray.groupie.GroupAdapter
+import com.xwray.groupie.GroupieViewHolder
 
 class ChatLogFragment : Fragment() {
     private val TAG = this::class.qualifiedName
@@ -37,11 +35,7 @@ class ChatLogFragment : Fragment() {
     private var _binding: FragmentChatLogBinding? = null
     private val binding get () = _binding!!
 
-    private lateinit var chatFromItemAdapter: ChatFromItemAdapter
-    private lateinit var chatToItemAdapter: ChatToItemAdapter
-
-    // The Concat Adapter shows the two adapter's contents in sequence on the screen.
-    private lateinit var concatAdapter: ConcatAdapter
+    private val adapter = GroupAdapter<GroupieViewHolder>()
 
     private lateinit var chatLogRecyclerView: RecyclerView
 
@@ -84,7 +78,7 @@ class ChatLogFragment : Fragment() {
         val fromUserId = auth.uid
             ?: throw NullPointerException("fromUserId cannot be null")
 
-        listenForMessages(fromUserId, toUserId)
+        listenForMessages(fromUserId, recipientUser)
 
         binding.sendButton.setOnClickListener {
             Log.d(TAG, "Send message...")
@@ -110,8 +104,8 @@ class ChatLogFragment : Fragment() {
         })
     }
 
-    private fun listenForMessages(fromUserId: String, toUserId: String) {
-        val ref = database.getReference("/user-messages/$fromUserId/$toUserId")
+    private fun listenForMessages(fromUserId: String, toUser: User) {
+        val ref = database.getReference("/user-messages/$fromUserId/${toUser.uid}")
 
         /* Notifies of every piece of data that belongs to the 'messages' node.
         This allows for listening for new messages as they are coming in real time. */
@@ -131,16 +125,11 @@ class ChatLogFragment : Fragment() {
                 // Decide which adapter to use based on the signed in user's ID.
                 // Get all existing messages and add the new one to it.
                 if (signedInUsersId == chatMessage.fromUserId) {
-                    val existingMessages: MutableList<String> = chatFromItemAdapter.getMessages().toMutableList()
-                    existingMessages.add(chatMessage.text)
-                    chatFromItemAdapter = ChatFromItemAdapter(existingMessages, fromUserProfileImageUrl)
+                    val signedInUser = LatestMessagesFragment.signedInUser
+                    adapter.add(FromChatItem(signedInUser!!, chatMessage.text))
                 } else {
-                    val existingMessages: MutableList<String> = chatToItemAdapter.getMessages().toMutableList()
-                    existingMessages.add(chatMessage.text)
-                    chatToItemAdapter = ChatToItemAdapter(existingMessages, toUserProfileImageUrl)
+                    adapter.add(ToChatItem(toUser, chatMessage.text))
                 }
-
-                setConcatAdapter()
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
@@ -171,7 +160,7 @@ class ChatLogFragment : Fragment() {
             .addOnSuccessListener {
                 Log.d(TAG, "Saved chat message: ${ref.key}")
                 binding.enterMessageEditText.text.clear()
-                chatLogRecyclerView.scrollToPosition(concatAdapter.itemCount - 1)
+                chatLogRecyclerView.scrollToPosition(adapter.itemCount - 1)
             }
 
         // Send the message to the fromUser's chat history as well so they also have a copy of the message.
@@ -184,13 +173,6 @@ class ChatLogFragment : Fragment() {
     private fun initChatLogRecyclerView() {
         chatLogRecyclerView = binding.chatLogRecyclerView.findViewById(R.id.chatLogRecyclerView)
         chatLogRecyclerView.layoutManager = LinearLayoutManager(activity)
-        chatFromItemAdapter = ChatFromItemAdapter(mutableListOf(), fromUserProfileImageUrl)
-        chatToItemAdapter = ChatToItemAdapter(mutableListOf(), toUserProfileImageUrl)
-        setConcatAdapter()
-    }
-
-    private fun setConcatAdapter() {
-        concatAdapter = ConcatAdapter(chatFromItemAdapter, chatToItemAdapter)
-        chatLogRecyclerView.adapter = concatAdapter
+        chatLogRecyclerView.adapter = adapter
     }
 }
