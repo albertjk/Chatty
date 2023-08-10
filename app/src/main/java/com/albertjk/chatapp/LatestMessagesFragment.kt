@@ -8,18 +8,23 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import androidx.recyclerview.widget.DividerItemDecoration
 import com.albertjk.chatapp.databinding.FragmentLatestMessagesBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.ktx.getValue
+import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.xwray.groupie.GroupAdapter
+import com.xwray.groupie.GroupieViewHolder
 
 class LatestMessagesFragment : Fragment() {
 
@@ -27,11 +32,16 @@ class LatestMessagesFragment : Fragment() {
 
     private lateinit var navController: NavController
 
-    // The shared instance of the FirebaseAuth object.
     private lateinit var auth: FirebaseAuth
 
+    private lateinit var database: FirebaseDatabase
+
     private var _binding: FragmentLatestMessagesBinding? = null
-    private val binding get () = _binding!!
+    private val binding get() = _binding!!
+
+    private val adapter = GroupAdapter<GroupieViewHolder>()
+
+    private val latestMessagesMap = HashMap<String, ChatMessage>()
 
     companion object {
         var signedInUser: User? = null
@@ -55,25 +65,35 @@ class LatestMessagesFragment : Fragment() {
 
         auth = Firebase.auth
 
+        database = Firebase.database
+
+        binding.latestMessagesRecyclerView.adapter = adapter
+        binding.latestMessagesRecyclerView.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+
+        setChatPartnerClickListener()
+
         checkUserIsLoggedIn()
 
         getSignedInUser()
+
+        listenForLatestMessages()
     }
 
-    private fun getSignedInUser() {
-        val ref = FirebaseDatabase.getInstance().getReference("/users/${auth.uid}")
-        ref.addListenerForSingleValueEvent(object: ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                signedInUser = snapshot.getValue(User::class.java)
-                if (signedInUser == null || signedInUser!!.isNullOrEmpty()) {
-                    throw NullPointerException("Recipient user data is missing.")
-                }
-                Log.d(TAG, "Currently signed in user: ${signedInUser!!.username}")
-            }
-            override fun onCancelled(error: DatabaseError) {
-                Log.e(TAG, "Getting the currently signed in user is cancelled. Error: $error")
-            }
-        })
+    /**
+     * Sets a click listener for the recycler view rows of the latest messages.
+     */
+    private fun setChatPartnerClickListener() {
+        adapter.setOnItemClickListener { item, _ ->
+            val row = item as LatestMessageRow
+
+
+            Log.d(TAG, "Chat partner clicked, opening ChatLogFragment...")
+            val bundle = bundleOf("user" to row.chatPartner)
+            navController.navigate(
+                R.id.action_latestMessagesFragment_to_chatLogFragment,
+                bundle
+            )
+        }
     }
 
     /**
@@ -87,6 +107,83 @@ class LatestMessagesFragment : Fragment() {
         }
     }
 
+    private fun getSignedInUser() {
+        val ref = database.getReference("/users/${auth.uid}")
+        ref.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                signedInUser = snapshot.getValue(User::class.java)
+                if (signedInUser == null || signedInUser!!.isNullOrEmpty()) {
+                    throw NullPointerException("Signed in user's data is missing.")
+                }
+                Log.d(TAG, "Currently signed in user: ${signedInUser!!.username}")
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e(TAG, "Getting the currently signed in user is cancelled. Error: $error")
+            }
+        })
+    }
+
+    private fun listenForLatestMessages() {
+        val fromUserId = auth.uid
+
+        // Already checked in getSignedInUser() that signedInUser is not null.
+        val ref = database.getReference("/latest-messages/$fromUserId")
+
+        ref.addChildEventListener(object : ChildEventListener {
+
+            // Handles when a new latest message is added to the database.
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                val chatMessage = snapshot.getValue(ChatMessage::class.java)
+                    ?: throw NullPointerException("Chat message cannot be null.")
+
+                val recipientUsersId = snapshot.key
+
+                if (!recipientUsersId.isNullOrEmpty()) {
+                    // Store the message in latestMessagesMap.
+                    // key is the recipient user's ID
+                    latestMessagesMap[recipientUsersId] = chatMessage
+
+                    refreshRecyclerView()
+                }
+            }
+
+            // Handles when a latest message by a user has changed.
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                val chatMessage = snapshot.getValue(ChatMessage::class.java)
+                    ?: throw NullPointerException("Chat message cannot be null.")
+
+                val recipientUsersId = snapshot.key
+
+                if (!recipientUsersId.isNullOrEmpty()) {
+                    // Store the message in latestMessagesMap.
+                    // key is the recipient user's ID
+                    latestMessagesMap[recipientUsersId] = chatMessage
+
+                    refreshRecyclerView()
+                }
+            }
+
+            override fun onChildRemoved(snapshot: DataSnapshot) {}
+
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e(
+                    TAG,
+                    "Getting the latest messages from the database is cancelled. Error: $error"
+                )
+            }
+        })
+    }
+
+    private fun refreshRecyclerView() {
+        // Clear all old messages and add new messages to the adapter.
+        adapter.clear()
+        latestMessagesMap.values.forEach { chatMessage ->
+            adapter.add(LatestMessageRow(chatMessage))
+        }
+    }
 
     /**
      * Creates the top navigation menu.
@@ -100,10 +197,11 @@ class LatestMessagesFragment : Fragment() {
      * Runs when a menu item is clicked.
      */
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId) {
+        when (item.itemId) {
             R.id.menu_new_message -> {
                 navController.navigate(R.id.action_latestMessagesFragment_to_newMessageFragment)
             }
+
             R.id.menu_log_out -> {
 
                 // Use Firebase Auth to sign the user out.

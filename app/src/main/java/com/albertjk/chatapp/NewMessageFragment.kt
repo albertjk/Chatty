@@ -9,7 +9,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.albertjk.chatapp.adapters.UsersAdapter
 import com.albertjk.chatapp.databinding.FragmentNewMessageBinding
@@ -84,7 +83,6 @@ class NewMessageFragment : Fragment() {
 
     private fun initUsersRecyclerView() {
         usersRecyclerView = binding.newMessageRecyclerView.findViewById(R.id.newMessageRecyclerView)
-        usersRecyclerView.layoutManager = LinearLayoutManager(activity)
         val usersAdapter = activity?.let { UsersAdapter(mutableListOf(), navController) }
         usersRecyclerView.adapter = usersAdapter
     }

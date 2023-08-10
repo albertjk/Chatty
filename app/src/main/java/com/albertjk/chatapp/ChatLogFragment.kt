@@ -9,8 +9,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.albertjk.chatapp.LatestMessagesFragment.Companion.signedInUser
 import com.albertjk.chatapp.databinding.FragmentChatLogBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ChildEventListener
@@ -118,8 +118,7 @@ class ChatLogFragment : Fragment() {
 
                 Log.d(TAG, "Chat message: ${chatMessage.text}")
 
-                // The signed in user's UID.
-                val signedInUsersId = FirebaseAuth.getInstance().uid
+                val signedInUsersId = signedInUser?.uid
                     ?: throw NullPointerException("fromUserId cannot be null")
 
                 // Decide which adapter to use based on the signed in user's ID.
@@ -154,12 +153,15 @@ class ChatLogFragment : Fragment() {
 
         val currentTimeInSeconds: Long = System.currentTimeMillis() / 1000
 
-        val chatMessage = ChatMessage(messageId, message, fromUserId, toUserId, currentTimeInSeconds)
+        val chatMessage =
+            ChatMessage(messageId, message, fromUserId, toUserId, currentTimeInSeconds)
 
         ref.setValue(chatMessage)
             .addOnSuccessListener {
                 Log.d(TAG, "Saved chat message: ${ref.key}")
                 binding.enterMessageEditText.text.clear()
+
+                // After sending the message, scroll to the bottom of the screen.
                 chatLogRecyclerView.scrollToPosition(adapter.itemCount - 1)
             }
 
@@ -168,11 +170,17 @@ class ChatLogFragment : Fragment() {
             .addOnSuccessListener {
                 Log.d(TAG, "Saved chat message copy: ${ref.key}")
             }
+
+        // Allows to keep track of the latest message between the currently logged in user and another user.
+        // Not using push() here as the aim is to overwrite the latest message saved in the database.
+        database.getReference("/latest-messages/$fromUserId/$toUserId").setValue(chatMessage)
+
+        // Store the counterpart message as the latest message received by the recipient user.
+        database.getReference("/latest-messages/$toUserId/$fromUserId").setValue(chatMessage)
     }
 
     private fun initChatLogRecyclerView() {
         chatLogRecyclerView = binding.chatLogRecyclerView.findViewById(R.id.chatLogRecyclerView)
-        chatLogRecyclerView.layoutManager = LinearLayoutManager(activity)
         chatLogRecyclerView.adapter = adapter
     }
 }
