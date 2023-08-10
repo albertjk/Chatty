@@ -129,6 +129,9 @@ class ChatLogFragment : Fragment() {
                 } else {
                     adapter.add(ToChatItem(toUser, chatMessage.text))
                 }
+
+                // Scroll to the bottom of the recycler view.
+                chatLogRecyclerView.scrollToPosition(adapter.itemCount - 1)
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
