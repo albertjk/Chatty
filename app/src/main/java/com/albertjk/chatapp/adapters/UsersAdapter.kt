@@ -34,10 +34,7 @@ class UsersAdapter(private val userList: MutableList<User>, private val navContr
                 binding.usernameTextView.text = user.username
 
                 holder.itemView.setOnClickListener {
-                    val bundle = bundleOf(
-//                "username" to holder.binding.usernameTextView.text
-                    "user" to user
-                    )
+                    val bundle = bundleOf("user" to user)
                     navController.navigate(
                         R.id.action_newMessageFragment_to_chatLogFragment,
                         bundle
