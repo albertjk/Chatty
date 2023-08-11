@@ -42,17 +42,33 @@ class ChatLogFragment : Fragment() {
     private var fromUserProfileImageUrl: String = ""
     private lateinit var toUserProfileImageUrl: String
 
+    private var recipientUser: User? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         // Inflate the layout for this fragment
         _binding = FragmentChatLogBinding.inflate(inflater, container, false)
+
+        recipientUser = arguments?.getParcelable("user")
+
+        if (recipientUser == null || recipientUser!!.isNullOrEmpty()) {
+            throw NullPointerException("Recipient user data is missing.")
+        }
+
+        toUserProfileImageUrl = recipientUser!!.profileImageUrl
+        Log.d(TAG, "toUserProfileImageUrl: $toUserProfileImageUrl")
+
+        (activity as AppCompatActivity?)!!.supportActionBar?.title = recipientUser!!.username
+
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val toUserId = recipientUser!!.uid
 
         navController = Navigation.findNavController(view)
 
@@ -60,25 +76,13 @@ class ChatLogFragment : Fragment() {
 
         database = Firebase.database
 
-        val recipientUser = arguments?.getParcelable<User>("user")
-
-        if (recipientUser == null || recipientUser.isNullOrEmpty()) {
-            throw NullPointerException("Recipient user data is missing.")
-        }
-
-        toUserProfileImageUrl = recipientUser.profileImageUrl
-        Log.d(TAG, "toUserProfileImageUrl: $toUserProfileImageUrl")
         getFromUser()
-
-        (activity as AppCompatActivity?)!!.supportActionBar?.title = recipientUser.username
-
-        val toUserId = recipientUser.uid
 
         // The signed in user's UID.
         val fromUserId = auth.uid
             ?: throw NullPointerException("fromUserId cannot be null")
 
-        listenForMessages(fromUserId, recipientUser)
+        listenForMessages(fromUserId, recipientUser!!)
 
         binding.sendButton.setOnClickListener {
             Log.d(TAG, "Send message...")

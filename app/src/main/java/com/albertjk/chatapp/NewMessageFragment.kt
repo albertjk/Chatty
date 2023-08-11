@@ -39,6 +39,7 @@ class NewMessageFragment : Fragment() {
     ): View {
         // Inflate the layout for this fragment
         _binding = FragmentNewMessageBinding.inflate(inflater, container, false)
+        (activity as AppCompatActivity?)!!.supportActionBar?.title = "Select User"
         return binding.root
     }
 
@@ -46,8 +47,6 @@ class NewMessageFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         navController = Navigation.findNavController(view)
-
-        (activity as AppCompatActivity?)!!.supportActionBar?.title = "Select User"
 
         initUsersRecyclerView()
 
