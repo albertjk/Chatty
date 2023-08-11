@@ -24,7 +24,7 @@
         android:textSize="16sp"
         android:textStyle="bold"
         android:textColor="@android:color/black"
-        android:text="Username"
+        tools:text="Username"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/photoImageView_user"

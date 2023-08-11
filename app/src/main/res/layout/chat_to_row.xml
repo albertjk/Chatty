@@ -27,7 +27,7 @@
         android:background="@drawable/rounded_edittext_register_login"
         android:maxWidth="240dp"
         android:padding="16dp"
-        android:text="Message"
+        tools:text="Message"
         android:textColor="@android:color/black"
         app:layout_constraintEnd_toStartOf="@+id/photoImageView_user_to_row"
         app:layout_constraintTop_toTopOf="parent" />
