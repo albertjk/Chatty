@@ -83,9 +83,9 @@
     </fragment>
     <fragment
         android:id="@+id/newMessageFragment"
-        android:name="com.albertjk.chatapp.NewMessageFragment"
+        android:name="com.albertjk.chatapp.SelectUserFragment"
         android:label="fragment_new_message"
-        tools:layout="@layout/fragment_new_message" >
+        tools:layout="@layout/fragment_select_user" >
         <action
             android:id="@+id/action_newMessageFragment_to_chatLogFragment"
             app:destination="@id/chatLogFragment"

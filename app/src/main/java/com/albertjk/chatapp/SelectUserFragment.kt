@@ -11,7 +11,7 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
 import com.albertjk.chatapp.adapters.UsersAdapter
-import com.albertjk.chatapp.databinding.FragmentNewMessageBinding
+import com.albertjk.chatapp.databinding.FragmentSelectUserBinding
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -20,7 +20,7 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
 
-class NewMessageFragment : Fragment() {
+class SelectUserFragment : Fragment() {
 
     private val TAG = this::class.qualifiedName
 
@@ -28,7 +28,7 @@ class NewMessageFragment : Fragment() {
 
     private lateinit var dbReference: DatabaseReference
 
-    private var _binding: FragmentNewMessageBinding? = null
+    private var _binding: FragmentSelectUserBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var usersRecyclerView: RecyclerView
@@ -38,7 +38,7 @@ class NewMessageFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         // Inflate the layout for this fragment
-        _binding = FragmentNewMessageBinding.inflate(inflater, container, false)
+        _binding = FragmentSelectUserBinding.inflate(inflater, container, false)
         (activity as AppCompatActivity?)!!.supportActionBar?.title = "Select User"
         return binding.root
     }
