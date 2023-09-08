@@ -15,15 +15,16 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
 class LoginFragment : Fragment(), View.OnClickListener {
-
-    private val TAG = this::class.qualifiedName
-
     private lateinit var navController: NavController
 
     // The shared instance of the FirebaseAuth object.
     private lateinit var auth: FirebaseAuth
 
     private var _binding: FragmentLoginBinding? = null
+
+    companion object {
+        private val TAG = this::class.qualifiedName
+    }
     private val binding get () = _binding!!
 
     override fun onCreateView(

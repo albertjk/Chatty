@@ -13,7 +13,9 @@ import com.squareup.picasso.Picasso
 class UsersAdapter(private val userList: MutableList<User>, private val navController: NavController):
     RecyclerView.Adapter<UsersAdapter.UsersViewHolder>() {
 
-    private val TAG = this::class.qualifiedName
+    companion object {
+        private val TAG = this::class.qualifiedName
+    }
 
     inner class UsersViewHolder(val binding: UserRowBinding): RecyclerView.ViewHolder(binding.root)
 

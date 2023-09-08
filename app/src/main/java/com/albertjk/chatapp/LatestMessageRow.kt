@@ -14,9 +14,11 @@ import com.xwray.groupie.viewbinding.BindableItem
 
 class LatestMessageRow(private val chatMessage: ChatMessage) : BindableItem<LatestMessageRowBinding>() {
 
-    private val TAG = this::class.qualifiedName
-
     var chatPartner: User? = null
+
+    companion object {
+        private val TAG = this::class.qualifiedName
+    }
 
     override fun getLayout() = R.layout.latest_message_row
 

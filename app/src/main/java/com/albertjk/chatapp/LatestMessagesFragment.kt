@@ -29,8 +29,6 @@ import com.xwray.groupie.GroupieViewHolder
 
 class LatestMessagesFragment : Fragment() {
 
-    private val TAG = this::class.qualifiedName
-
     private lateinit var navController: NavController
 
     private lateinit var auth: FirebaseAuth
@@ -38,15 +36,16 @@ class LatestMessagesFragment : Fragment() {
     private lateinit var database: FirebaseDatabase
 
     private var _binding: FragmentLatestMessagesBinding? = null
-    private val binding get() = _binding!!
-
     private val adapter = GroupAdapter<GroupieViewHolder>()
 
     private val latestMessagesMap = HashMap<String, ChatMessage>()
 
     companion object {
         var signedInUser: User? = null
+        private val TAG = this::class.qualifiedName
     }
+
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

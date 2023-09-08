@@ -21,17 +21,19 @@ import com.google.firebase.ktx.Firebase
 
 
 class SelectUserFragment : Fragment() {
-
-    private val TAG = this::class.qualifiedName
-
     private lateinit var navController: NavController
 
     private lateinit var dbReference: DatabaseReference
 
     private var _binding: FragmentSelectUserBinding? = null
-    private val binding get() = _binding!!
 
     private lateinit var usersRecyclerView: RecyclerView
+
+    companion object {
+        private val TAG = this::class.qualifiedName
+    }
+
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

@@ -24,8 +24,6 @@ import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 
 class ChatLogFragment : Fragment() {
-    private val TAG = this::class.qualifiedName
-
     private lateinit var navController: NavController
 
     private lateinit var auth: FirebaseAuth
@@ -43,6 +41,10 @@ class ChatLogFragment : Fragment() {
     private lateinit var toUserProfileImageUrl: String
 
     private var recipientUser: User? = null
+
+    companion object {
+        private val TAG = this::class.qualifiedName
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

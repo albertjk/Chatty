@@ -24,9 +24,6 @@ import com.google.firebase.storage.ktx.storage
 import java.util.*
 
 class RegisterFragment : Fragment(), View.OnClickListener {
-
-    private val TAG = this::class.qualifiedName
-
     private lateinit var navController: NavController
 
     private lateinit var auth: FirebaseAuth
@@ -38,6 +35,11 @@ class RegisterFragment : Fragment(), View.OnClickListener {
     private lateinit var database: FirebaseDatabase
 
     private var _binding: FragmentRegisterBinding? = null
+
+    companion object {
+        private val TAG = this::class.qualifiedName
+    }
+
     private val binding get () = _binding!!
 
     override fun onCreateView(
