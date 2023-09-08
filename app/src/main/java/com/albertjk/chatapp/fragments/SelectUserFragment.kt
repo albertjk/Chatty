@@ -1,4 +1,4 @@
-package com.albertjk.chatapp
+package com.albertjk.chatapp.fragments
 
 import android.os.Bundle
 import android.util.Log
@@ -10,6 +10,8 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
+import com.albertjk.chatapp.R
+import com.albertjk.chatapp.models.User
 import com.albertjk.chatapp.adapters.UsersAdapter
 import com.albertjk.chatapp.databinding.FragmentSelectUserBinding
 import com.google.firebase.database.DataSnapshot

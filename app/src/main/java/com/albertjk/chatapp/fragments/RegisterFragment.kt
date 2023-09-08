@@ -1,4 +1,4 @@
-package com.albertjk.chatapp
+package com.albertjk.chatapp.fragments
 
 import android.app.Activity
 import android.content.Intent
@@ -13,6 +13,8 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import com.albertjk.chatapp.R
+import com.albertjk.chatapp.models.User
 import com.albertjk.chatapp.databinding.FragmentRegisterBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth

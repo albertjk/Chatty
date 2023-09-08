@@ -1,10 +1,11 @@
-package com.albertjk.chatapp
+package com.albertjk.chatapp.view_rows
 
 import android.view.View
+import com.albertjk.chatapp.R
 import com.albertjk.chatapp.databinding.ChatFromRowBinding
 import com.albertjk.chatapp.databinding.ChatToRowBinding
+import com.albertjk.chatapp.models.User
 import com.xwray.groupie.viewbinding.BindableItem
-
 
 class FromChatItem(private val user: User, private val text: String): BindableItem<ChatFromRowBinding>() {
 

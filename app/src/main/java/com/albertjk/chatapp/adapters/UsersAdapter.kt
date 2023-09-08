@@ -6,7 +6,7 @@ import androidx.core.os.bundleOf
 import androidx.navigation.NavController
 import androidx.recyclerview.widget.RecyclerView
 import com.albertjk.chatapp.R
-import com.albertjk.chatapp.User
+import com.albertjk.chatapp.models.User
 import com.albertjk.chatapp.databinding.UserRowBinding
 import com.squareup.picasso.Picasso
 

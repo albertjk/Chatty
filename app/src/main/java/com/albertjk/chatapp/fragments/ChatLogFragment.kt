@@ -1,4 +1,4 @@
-package com.albertjk.chatapp
+package com.albertjk.chatapp.fragments
 
 import android.os.Bundle
 import android.util.Log
@@ -10,7 +10,12 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
-import com.albertjk.chatapp.LatestMessagesFragment.Companion.signedInUser
+import com.albertjk.chatapp.models.ChatMessage
+import com.albertjk.chatapp.view_rows.FromChatItem
+import com.albertjk.chatapp.R
+import com.albertjk.chatapp.view_rows.ToChatItem
+import com.albertjk.chatapp.models.User
+import com.albertjk.chatapp.fragments.LatestMessagesFragment.Companion.signedInUser
 import com.albertjk.chatapp.databinding.FragmentChatLogBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ChildEventListener

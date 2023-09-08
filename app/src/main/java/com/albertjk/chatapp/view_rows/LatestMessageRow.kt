@@ -1,9 +1,11 @@
-package com.albertjk.chatapp
+package com.albertjk.chatapp.view_rows
 
 import android.util.Log
 import android.view.View
-import androidx.core.os.bundleOf
+import com.albertjk.chatapp.R
 import com.albertjk.chatapp.databinding.LatestMessageRowBinding
+import com.albertjk.chatapp.models.ChatMessage
+import com.albertjk.chatapp.models.User
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError

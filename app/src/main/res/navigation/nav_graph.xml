@@ -9,7 +9,7 @@
 
     <fragment
         android:id="@+id/registerFragment"
-        android:name="com.albertjk.chatapp.RegisterFragment"
+        android:name="com.albertjk.chatapp.fragments.RegisterFragment"
         android:label="RegisterFragment" >
         <action
             android:id="@+id/action_registerFragment_to_loginFragment"
@@ -34,7 +34,7 @@
 
     <fragment
         android:id="@+id/loginFragment"
-        android:name="com.albertjk.chatapp.LoginFragment"
+        android:name="com.albertjk.chatapp.fragments.LoginFragment"
         android:label="LoginFragment" >
         <action
             android:id="@+id/action_loginFragment_to_registerFragment"
@@ -55,7 +55,7 @@
     </fragment>
     <fragment
         android:id="@+id/latestMessagesFragment"
-        android:name="com.albertjk.chatapp.LatestMessagesFragment"
+        android:name="com.albertjk.chatapp.fragments.LatestMessagesFragment"
         android:label="LatestMessagesFragment" >
         <action
             android:id="@+id/action_latestMessagesFragment_to_registerFragment"
@@ -83,7 +83,7 @@
     </fragment>
     <fragment
         android:id="@+id/newMessageFragment"
-        android:name="com.albertjk.chatapp.SelectUserFragment"
+        android:name="com.albertjk.chatapp.fragments.SelectUserFragment"
         android:label="fragment_new_message"
         tools:layout="@layout/fragment_select_user" >
         <action
@@ -96,13 +96,13 @@
     </fragment>
     <fragment
         android:id="@+id/chatLogFragment"
-        android:name="com.albertjk.chatapp.ChatLogFragment"
+        android:name="com.albertjk.chatapp.fragments.ChatLogFragment"
         android:label="fragment_chat_log"
         tools:layout="@layout/fragment_chat_log" >
         <action android:id="@+id/action_chatLogFragment_to_newMessageFragment"
             app:destination="@id/newMessageFragment" />
         <argument
             android:name="user"
-            app:argType="com.albertjk.chatapp.User" />
+            app:argType="com.albertjk.chatapp.models.User" />
     </fragment>
 </navigation>
