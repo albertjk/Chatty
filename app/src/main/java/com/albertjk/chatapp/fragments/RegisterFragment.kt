@@ -26,6 +26,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
 import java.util.*
 
+const val PASSWORD_REGEX = "^\\w{8,}\$"
 
 class RegisterFragment : Fragment(), View.OnClickListener {
     private lateinit var navController: NavController
@@ -127,59 +128,83 @@ class RegisterFragment : Fragment(), View.OnClickListener {
         Log.d(TAG, "email is $email")
         Log.d(TAG, "password is $password")
 
-        /* If the user did not add a photo or fill out a field, tell them.
-        Otherwise, create a new user account. */
-        var warningMessage = ""
+        val validInput = validateInput(username, email, password)
+
+        if (validInput) {
+
+                auth.createUserWithEmailAndPassword(email, password)
+                    .addOnCompleteListener {
+
+                        // Registration successful.
+                        if (it.isSuccessful) {
+                            Log.d(TAG, "Successfully created user with uid: ${it.result!!.user!!.uid}")
+                            Toast.makeText(this.context, "Account created.", Toast.LENGTH_SHORT).show()
+
+                            uploadImageToFirebaseStorage()
+                        }
+                        /* If it fails, display a message to the user.
+                        Input validation errors are displayed here by Firebase Auth.
+                        If the e-mail is already in use, a message is displayed here by Firebase Auth. */
+                        else {
+                            Log.w(TAG, "createUserWithEmail: failure", it.exception)
+                            Log.d(TAG, it.exception!!.message.toString())
+                            Toast.makeText(this.context, it.exception!!.message, Toast.LENGTH_LONG).show()
+                            return@addOnCompleteListener
+                        }
+                    }
+                .addOnFailureListener {
+                    Log.d(TAG, "Failed to create user: ${it.message}")
+                    Toast.makeText(this.context, "Failed to create user: ${it.message}", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+
+    fun validateInput(username: String, email: String, password: String): Boolean {
+        val warningMessage = mutableListOf<String>()
         if (binding.photoButton.alpha != 0f) {
-            warningMessage += "Please add a photo. "
+            warningMessage.add("Please add a photo.")
         }
         if (username.isEmpty()) {
-            warningMessage += "Please enter a valid username. "
+            warningMessage.add("Please enter a valid username.")
         }
         if (email.isEmpty()) {
-            warningMessage += "Please enter a valid email. "
+            warningMessage.add("Please enter a valid email.")
         }
         if (password.isEmpty()) {
-            warningMessage += "Please enter a valid password. "
+            warningMessage.add("Please enter a valid password.")
         }
 
         if (binding.photoButton.alpha != 0f || username.isEmpty() || email.isEmpty() || password.isEmpty()) {
-            if (warningMessage.length > 10) {
-                warningMessage = "Please enter valid input."
+            if (warningMessage.size == 1) {
+                Toast.makeText(this.context, warningMessage[0], Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(this.context,"Please enter valid input.", Toast.LENGTH_LONG).show()
             }
-            Toast.makeText(this.context, warningMessage, Toast.LENGTH_LONG).show()
-            return
+
+            return false
         } else {
-            auth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener {
+            val validPassword = isValidPassword(password)
 
-                    // Registration successful.
-                    if (it.isSuccessful) {
-                        Log.d(TAG, "Successfully created user with uid: ${it.result!!.user!!.uid}")
-                        Toast.makeText(this.context, "Account created.", Toast.LENGTH_SHORT).show()
+            return if (!validPassword) {
+                Toast.makeText(
+                    this.context,
+                    "The password doesn't meet the requirements.",
+                    Toast.LENGTH_LONG
+                ).show()
+                false
 
-                        uploadImageToFirebaseStorage()
-
-                        // Redirect the user to the LatestMessagesFragment.
-//                        navController.navigate(R.id.action_registerFragment_to_latestMessagesFragment)
-
-                    }
-                    /* If it fails, display a message to the user.
-                    Input validation errors are displayed here by Firebase Auth.
-                    If the e-mail is already in use, a message is displayed here by Firebase Auth. */
-                    else {
-                        Log.w(TAG, "createUserWithEmail: failure", it.exception)
-                        Log.d(TAG, it.exception!!.message.toString())
-                        Toast.makeText(this.context, it.exception!!.message, Toast.LENGTH_LONG).show()
-                        return@addOnCompleteListener
-                    }
-                }
-
-//                .addOnFailureListener {
-//                    Log.d(TAG, "Failed to create user: ${it.message}")
-//                    Toast.makeText(this.context, "Failed to create user: ${it.message}", Toast.LENGTH_LONG).show()
-//                }
+            } else {
+                true
+            }
         }
+    }
+
+    /**
+     * Validates the password to see if it is strong enough.
+     */
+    private fun isValidPassword(password: String): Boolean {
+        val regex = Regex(PASSWORD_REGEX)
+        return regex.matches(password)
     }
 
     /**
@@ -229,12 +254,6 @@ class RegisterFragment : Fragment(), View.OnClickListener {
 
                 // The user is automatically logged in, so redirect them to the Latest Messages fragment.
                 navController.navigate(R.id.action_registerFragment_to_latestMessagesFragment)
-
-                // val user = auth.currentUser
-
-
-
-
             }
             .addOnFailureListener {
                 Log.e(TAG, "Error. $it")
