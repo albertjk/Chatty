@@ -1,5 +1,7 @@
 package com.albertjk.chatapp.fragments
 
+import android.app.Activity
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -8,17 +10,18 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.DividerItemDecoration
-import com.albertjk.chatapp.models.ChatMessage
-import com.albertjk.chatapp.view_rows.LatestMessageRow
 import com.albertjk.chatapp.R
-import com.albertjk.chatapp.models.User
 import com.albertjk.chatapp.databinding.FragmentLatestMessagesBinding
+import com.albertjk.chatapp.models.ChatMessage
+import com.albertjk.chatapp.models.User
+import com.albertjk.chatapp.view_rows.LatestMessageRow
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.ChildEventListener
@@ -30,6 +33,7 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
+
 
 class LatestMessagesFragment : Fragment() {
 
@@ -61,6 +65,7 @@ class LatestMessagesFragment : Fragment() {
         _binding = FragmentLatestMessagesBinding.inflate(inflater, container, false)
         (activity as AppCompatActivity?)!!.supportActionBar!!.show()
         (activity as AppCompatActivity?)!!.supportActionBar?.title = "Latest Messages"
+        hideKeyboard(activity as AppCompatActivity)
         return binding.root
     }
 
@@ -83,6 +88,17 @@ class LatestMessagesFragment : Fragment() {
         getSignedInUser()
 
         listenForLatestMessages()
+    }
+
+    private fun hideKeyboard(activity: Activity) {
+        val inputManager =
+            activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        if (activity.currentFocus != null) {
+            inputManager.hideSoftInputFromWindow(
+                activity.currentFocus!!
+                    .windowToken, InputMethodManager.HIDE_NOT_ALWAYS
+            )
+        }
     }
 
     /**
