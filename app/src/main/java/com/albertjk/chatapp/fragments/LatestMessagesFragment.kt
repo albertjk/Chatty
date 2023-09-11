@@ -59,6 +59,7 @@ class LatestMessagesFragment : Fragment() {
 
         // Inflate the layout for this fragment
         _binding = FragmentLatestMessagesBinding.inflate(inflater, container, false)
+        (activity as AppCompatActivity?)!!.supportActionBar!!.show()
         (activity as AppCompatActivity?)!!.supportActionBar?.title = "Latest Messages"
         return binding.root
     }

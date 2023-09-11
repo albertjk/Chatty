@@ -10,12 +10,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.albertjk.chatapp.R
-import com.albertjk.chatapp.models.User
 import com.albertjk.chatapp.databinding.FragmentRegisterBinding
+import com.albertjk.chatapp.models.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.FirebaseDatabase
@@ -24,6 +25,7 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
 import java.util.*
+
 
 class RegisterFragment : Fragment(), View.OnClickListener {
     private lateinit var navController: NavController
@@ -50,6 +52,7 @@ class RegisterFragment : Fragment(), View.OnClickListener {
     ): View {
         // Inflate the layout for this fragment
         _binding = FragmentRegisterBinding.inflate(inflater, container, false)
+        (activity as AppCompatActivity?)!!.supportActionBar!!.hide()
         return binding.root
     }
 
