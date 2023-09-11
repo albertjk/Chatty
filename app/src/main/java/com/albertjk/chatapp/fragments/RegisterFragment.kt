@@ -70,12 +70,6 @@ class RegisterFragment : Fragment(), View.OnClickListener {
         // Initialise the Firebase Realtime Database.
         database = Firebase.database
 
-        // Check if user is signed in (non-null).
-        //val currentUser = auth.currentUser
-        //if(currentUser != null) {
-        //    reload()
-        //}
-
         binding.photoButton.setOnClickListener(this)
         binding.registerButton.setOnClickListener(this)
         binding.alreadyHaveAnAccountTextView.setOnClickListener(this)

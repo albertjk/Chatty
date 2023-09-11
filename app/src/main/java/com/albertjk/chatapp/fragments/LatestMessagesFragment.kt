@@ -1,7 +1,9 @@
 package com.albertjk.chatapp.fragments
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
+import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -225,12 +227,26 @@ class LatestMessagesFragment : Fragment() {
             }
 
             R.id.menu_log_out -> {
+                val alertDialog = AlertDialog.Builder(context)
+                alertDialog.setMessage("Are you sure you want to log out?")
 
-                // Use Firebase Auth to sign the user out.
-                auth.signOut()
+                alertDialog.setPositiveButton("Yes"
+                ) { dialog, _ ->
+                    // Use Firebase Auth to sign the user out.
+                    auth.signOut()
 
-                // Launch Register fragment.
-                navController.navigate(R.id.action_latestMessagesFragment_to_registerFragment)
+                    // Launch Register fragment.
+                    navController.navigate(R.id.action_latestMessagesFragment_to_registerFragment)
+
+                    dialog.dismiss()
+                }
+
+                alertDialog.setNegativeButton("No"
+                ) { dialog, _ ->
+                    dialog.dismiss()
+                }
+
+                alertDialog.create().show()
             }
         }
 
