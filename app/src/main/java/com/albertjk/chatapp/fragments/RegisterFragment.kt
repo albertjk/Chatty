@@ -26,7 +26,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
 import java.util.*
 
-const val PASSWORD_REGEX = "^\\w{8,}\$"
+const val PASSWORD_REGEX = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$"
 
 class RegisterFragment : Fragment(), View.OnClickListener {
     private lateinit var navController: NavController
@@ -128,10 +128,13 @@ class RegisterFragment : Fragment(), View.OnClickListener {
         Log.d(TAG, "email is $email")
         Log.d(TAG, "password is $password")
 
-        val validInput = validateInput(username, email, password)
+        val photoAlpha = binding.photoButton.alpha
 
-        if (validInput) {
+        val (validInput, errorMessage) = validateInput(photoAlpha, username, email, password)
 
+        if (!validInput) {
+            Toast.makeText(this.context,errorMessage, Toast.LENGTH_LONG).show()
+        } else {
                 auth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener {
 
@@ -159,9 +162,9 @@ class RegisterFragment : Fragment(), View.OnClickListener {
             }
         }
 
-    fun validateInput(username: String, email: String, password: String): Boolean {
+    fun validateInput(photoAlpha: Float, username: String, email: String, password: String): Pair<Boolean, String> {
         val warningMessage = mutableListOf<String>()
-        if (binding.photoButton.alpha != 0f) {
+        if (photoAlpha != 0f) {
             warningMessage.add("Please add a photo.")
         }
         if (username.isEmpty()) {
@@ -174,27 +177,18 @@ class RegisterFragment : Fragment(), View.OnClickListener {
             warningMessage.add("Please enter a valid password.")
         }
 
-        if (binding.photoButton.alpha != 0f || username.isEmpty() || email.isEmpty() || password.isEmpty()) {
+        return if (warningMessage.size > 0) {
             if (warningMessage.size == 1) {
-                Toast.makeText(this.context, warningMessage[0], Toast.LENGTH_LONG).show()
+                Pair(false, warningMessage[0])
             } else {
-                Toast.makeText(this.context,"Please enter valid input.", Toast.LENGTH_LONG).show()
+                Pair(false, "Please enter valid input.")
             }
-
-            return false
         } else {
             val validPassword = isValidPassword(password)
-
-            return if (!validPassword) {
-                Toast.makeText(
-                    this.context,
-                    "The password doesn't meet the requirements.",
-                    Toast.LENGTH_LONG
-                ).show()
-                false
-
+            if (!validPassword) {
+                Pair(false, "The password doesn't meet the requirements.")
             } else {
-                true
+                Pair(true, "")
             }
         }
     }
