@@ -39,6 +39,12 @@ Other tools and technologies used:
 * Firebase Realtime Database
 * Firebase Storage
 * Firebase Authentication
+* [Picasso library](https://github.com/square/picasso)
+* [Groupie library](https://github.com/lisawray/groupie)
+
+## Currently working on
+
+* Writing UI tests using Espresso
 
 ## Getting Started
 
